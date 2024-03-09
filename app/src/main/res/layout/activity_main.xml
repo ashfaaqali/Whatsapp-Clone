@@ -47,7 +47,7 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
         app:tabTextColor="@android:color/white"
         app:tabMode="fixed"
