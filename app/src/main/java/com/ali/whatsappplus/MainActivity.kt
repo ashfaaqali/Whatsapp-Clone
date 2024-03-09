@@ -1,34 +1,45 @@
 package com.ali.whatsappplus
 
-import androidx.appcompat.app.AppCompatActivity
+import MainViewPagerAdapter
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager.widget.ViewPager
 import com.ali.whatsappplus.databinding.ActivityMainBinding
-import com.ali.whatsappplus.ui.adapter.MainViewPagerAdapter
-import com.ali.whatsappplus.ui.fragment.CallsFragment
-import com.ali.whatsappplus.ui.fragment.CommunitiesFragment
-import com.ali.whatsappplus.ui.fragment.OngoingChatsFragment
-import com.ali.whatsappplus.ui.fragment.UpdatesFragment
+import com.google.android.material.tabs.TabLayout
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var tabLayout: TabLayout
+    private lateinit var viewPager: ViewPager
     private lateinit var binding: ActivityMainBinding
-    private lateinit var adapter: MainViewPagerAdapter
+    private lateinit var viewPagerAdapter: MainViewPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
 
-        adapter = MainViewPagerAdapter(supportFragmentManager)
+        tabLayout = findViewById(R.id.tab_layout)
+        viewPager = findViewById(R.id.view_pager)
 
-        // Dynamically add tabs
-        adapter.addFragment(CommunitiesFragment(), "Communities")
-        adapter.addFragment(OngoingChatsFragment(), "Chats")
-        adapter.addFragment(UpdatesFragment(), "Updates")
-        adapter.addFragment(CallsFragment(), "Calls")
-        adapter.notifyDataSetChanged()
+        tabLayout.addTab(tabLayout.newTab().setText("Chats"))
+        tabLayout.addTab(tabLayout.newTab().setText("Updates"))
+        tabLayout.addTab(tabLayout.newTab().setText("Calls"))
+        tabLayout.tabGravity = TabLayout.GRAVITY_FILL
 
-        binding.viewPager.adapter = adapter
-        binding.tabLayout.setupWithViewPager(binding.viewPager)
+        viewPagerAdapter = MainViewPagerAdapter(supportFragmentManager, tabLayout.tabCount)
+        viewPager.adapter = viewPagerAdapter
+
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                viewPager.currentItem = tab.position
+                viewPagerAdapter.notifyDataSetChanged()
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+
+        viewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabLayout))
     }
 }

@@ -1,29 +1,24 @@
-package com.ali.whatsappplus.ui.adapter
-
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.fragment.app.FragmentPagerAdapter
+import com.ali.whatsappplus.ui.fragment.CallsFragment
+import com.ali.whatsappplus.ui.fragment.CommunitiesFragment
+import com.ali.whatsappplus.ui.fragment.OngoingChatsFragment
+import com.ali.whatsappplus.ui.fragment.UpdatesFragment
 
-class MainViewPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
-    private val fragmentList = mutableListOf<Fragment>()
-    private val fragmentTitleList = mutableListOf<String>()
+class MainViewPagerAdapter(fm: FragmentManager, private val tabCount: Int) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
     override fun getItem(position: Int): Fragment {
-        return fragmentList[position]
+        return when (position) {
+            0 -> CommunitiesFragment()
+            1 -> OngoingChatsFragment()
+            2 -> UpdatesFragment()
+            3 -> CallsFragment()
+            else -> throw IllegalArgumentException("Invalid position: $position")
+        }
     }
 
     override fun getCount(): Int {
-        return fragmentList.size
-    }
-
-    override fun getPageTitle(position: Int): CharSequence {
-        return fragmentTitleList[position]
-    }
-
-    fun addFragment(fragment: Fragment, title: String) {
-        fragmentList.add(fragment)
-        fragmentTitleList.add(title)
-        Log.d("MainViewPagerAdapter", "Added fragment with title: $title")
+        return tabCount
     }
 }
