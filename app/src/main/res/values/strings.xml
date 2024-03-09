@@ -1,7 +1,25 @@
 <resources>
     <string name="app_name">Whatsapp Plus</string>
-    <string name="new_chat">new_chat</string>
+    <string name="new_chat">New contact</string>
     <string name="whatsapp">Whatsapp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="ashfaq">Ashfaq</string>
+    <string name="hi">Hi</string>
+    <string name="_5_44_am">5:44 am</string>
+    <string name="select_contact">Select contact</string>
+    <string name="_50_contacts">50 contacts</string>
+    <string name="back">back</string>
+    <string name="search">search</string>
+    <string name="options">options</string>
+    <string name="new_contact">New Contact</string>
+    <string name="new_group">New group</string>
+    <string name="contacts_on_whatsapp">Contacts on Whatsapp</string>
+    <string name="at_the_gym">At the gym</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="emojis">emojis</string>
+    <string name="camera">Camera</string>
+    <string name="attachment">Attachment</string>
+    <string name="message">Message</string>
+    <string name="online">online</string>
 </resources>

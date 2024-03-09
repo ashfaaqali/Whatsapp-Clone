@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="?attr/colorPrimary"
+        android:paddingVertical="8dp">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="0dp"
+            android:layout_weight="0.1"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/white"
+            android:paddingHorizontal="8dp"
+            android:contentDescription="@string/back" />
+        
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="0.65"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/select_contact"
+                android:textColor="@color/white"
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/total_contacts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/_50_contacts"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/search"
+            android:layout_width="0dp"
+            android:layout_weight="0.1"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            app:tint="@color/white"
+            android:src="@drawable/ic_search"
+            android:contentDescription="@string/search" />
+
+        <ImageView
+            android:id="@+id/options"
+            android:layout_width="0dp"
+            android:layout_weight="0.1"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            app:tint="@color/white"
+            android:src="@drawable/ic_options"
+            android:contentDescription="@string/options" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@id/toolbar"
+        android:id="@+id/new_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_group"
+            android:background="@drawable/circular_bg"
+            app:tint="@color/white"
+            android:padding="12dp"
+            android:contentDescription="@string/new_group" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/new_group"
+            android:layout_marginStart="12dp"
+            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.Material3.TitleSmall"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_below="@id/new_group"
+        android:id="@+id/new_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="10dp"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_person_add"
+            android:background="@drawable/circular_bg"
+            app:tint="@color/white"
+            android:padding="12dp"
+            android:contentDescription="@string/new_group" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/new_chat"
+            android:layout_marginStart="12dp"
+            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.Material3.TitleSmall"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_below="@id/new_chat"
+        android:id="@+id/text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/contacts_on_whatsapp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="10dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_below="@id/text_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="16dp"/>
+
+</RelativeLayout>

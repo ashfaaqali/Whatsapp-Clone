@@ -7,5 +7,10 @@
         <item name="colorAccent">#25D366</item> <!-- WhatsApp's green accent color -->
     </style>
 
+    <style name="circularImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
     <style name="Theme.WhatsappPlus" parent="Base.Theme.WhatsappPlus" />
 </resources>

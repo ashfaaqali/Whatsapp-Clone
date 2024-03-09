@@ -1,0 +1,22 @@
+{
+  "chats": [
+    {
+      "id": 1,
+      "contact_name": "John Doe",
+      "last_message": "Hey, how's it going?",
+      "timestamp": "2 Minutes"
+    },
+    {
+      "id": 2,
+      "contact_name": "Jane Smith",
+      "last_message": "Sure, I'll be there!",
+      "timestamp": "Yesterday"
+    },
+    {
+      "id": 3,
+      "contact_name": "Alice Johnson",
+      "last_message": "See you later!",
+      "timestamp": "3/9/2024"
+    }
+  ]
+}

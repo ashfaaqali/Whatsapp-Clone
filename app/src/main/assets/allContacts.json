@@ -1,0 +1,39 @@
+{
+  "contacts": [
+    {
+      "id": 1,
+      "name": "Black Widow",
+      "status": "I'm on a mission"
+    },
+    {
+      "id": 2,
+      "name": "Walter White",
+      "status": "Cooking up some blue"
+    },
+    {
+      "id": 3,
+      "name": "Chulbul Pandey",
+      "status": "Dabangg mode"
+    },
+    {
+      "id": 4,
+      "name": "Thor",
+      "status": "Protecting Asgard"
+    },
+    {
+      "id": 5,
+      "name": "Daenerys Targaryen",
+      "status": "Conquering the Seven Kingdoms"
+    },
+    {
+      "id": 6,
+      "name": "Gabbar Singh",
+      "status": "Kitne aadmi the?"
+    },
+    {
+      "id": 7,
+      "name": "Heisenberg",
+      "status": "I am the danger"
+    }
+  ]
+}

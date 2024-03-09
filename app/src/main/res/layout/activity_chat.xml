@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E0E1DC"
+    android:orientation="vertical"
+    tools:context=".ui.activity.ChatActivity">
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingVertical="8dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/back"
+                android:padding="4dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:id="@+id/profile_pic"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/back"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.6"
+            android:orientation="vertical"
+            android:layout_marginStart="2dp"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/contact_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ashfaq"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/total_contacts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/online"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/video_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/search"
+            android:padding="8dp"
+            android:src="@drawable/ic_video"
+            app:tint="@color/white" />
+
+        <ImageView
+            android:id="@+id/voice_call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/search"
+            android:padding="8dp"
+            android:layout_marginStart="3dp"
+            android:src="@drawable/ic_voice"
+            app:tint="@color/white" />
+
+        <ImageView
+            android:id="@+id/options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/options"
+            android:padding="8dp"
+            android:src="@drawable/ic_options"
+            app:tint="@color/white" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="4dp"
+        android:layout_marginBottom="6dp">
+
+        <LinearLayout
+            android:id="@+id/edit_text_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="@drawable/chat_screen_bottom_bg"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/voice_recorder"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="0.15"
+                android:contentDescription="@string/emojis"
+                android:padding="12dp"
+                android:src="@drawable/ic_emoji"
+                app:tint="#868686" />
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.55"
+                android:hint="@string/message"
+                android:textColorHint="#868686"
+                android:inputType="text"
+                android:backgroundTint="@android:color/transparent"
+                android:autofillHints="@null" />
+
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="0.15"
+                android:contentDescription="@string/attachment"
+                android:padding="12dp"
+                android:src="@drawable/ic_attachment"
+                app:tint="#868686" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="0.15"
+                android:contentDescription="@string/camera"
+                android:padding="12dp"
+                android:src="@drawable/ic_camera"
+                app:tint="#868686" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/voice_recorder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/camera"
+            android:padding="12dp"
+            android:background="@drawable/circular_bg"
+            android:src="@drawable/ic_mic"
+            app:tint="@color/white"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>

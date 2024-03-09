@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:padding="14dp"
         android:gravity="center_vertical"
         android:background="?attr/colorPrimary">
 
@@ -18,26 +18,25 @@
             android:layout_weight="0.6"
             android:layout_height="wrap_content"
             android:text="@string/whatsapp"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textColor="@color/white" />
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="0dp"
-            android:layout_weight="0.1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_camera"
+            android:paddingHorizontal="10dp"
+            android:src="@drawable/ic_camera_outlined"
             app:tint="@color/white"/>
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="0dp"
-            android:layout_weight="0.1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
             android:src="@drawable/ic_search"
             app:tint="@color/white"/>
 
         <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="0dp"
-            android:layout_weight="0.1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_options"
             app:tint="@color/white"/>
@@ -49,9 +48,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"
-        app:tabTextColor="@android:color/white"
+        app:tabTextColor="#9EE4DC"
+        app:tabSelectedTextColor="@color/white"
         app:tabMode="fixed"
         app:tabGravity="fill"
+        app:tabIndicatorFullWidth="true"
+        android:elevation="5dp"
         app:tabIndicatorColor="@color/white"
         android:background="?attr/colorPrimary"/>
 
