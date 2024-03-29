@@ -5,7 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ali.whatsappplus.data.model.Message
 import com.ali.whatsappplus.data.model.RecentChats
+import com.ali.whatsappplus.util.Constants
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class RecentChatsViewModel() : ViewModel() {

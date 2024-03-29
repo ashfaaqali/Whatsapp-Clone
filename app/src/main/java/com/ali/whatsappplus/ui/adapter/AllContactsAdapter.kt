@@ -3,10 +3,11 @@ package com.ali.whatsappplus.ui.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.ali.whatsappplus.data.model.AllContacts
 import com.ali.whatsappplus.databinding.AllContactsItemBinding
+import com.bumptech.glide.Glide
+import com.cometchat.chat.models.User
 
-class AllContactsAdapter(private var contactList: List<AllContacts>) :
+class AllContactsAdapter(private var userList: List<User>) :
     RecyclerView.Adapter<AllContactsAdapter.MyViewHolder>() {
 
     var listener: OnContactItemClickListener? = null
@@ -24,29 +25,33 @@ class AllContactsAdapter(private var contactList: List<AllContacts>) :
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val contact = contactList[position]
+        val user = userList[position]
 
         with(holder.binding) {
-            contactName.text = contact.name
-            contactStatus.text = contact.status
+            contactName.text = user.name
+            contactStatus.text = user.status
+
+            Glide.with(holder.itemView)
+                .load(user.avatar)
+                .into(profilePic)
         }
 
         holder.itemView.setOnClickListener{
-            listener?.onContactItemClicked(contact)
+            listener?.onContactItemClicked(user)
         }
     }
 
     override fun getItemCount(): Int {
-        return contactList.size
+        return userList.size
     }
 
-    fun setData(allContacts: List<AllContacts>) {
-        this.contactList = allContacts
+    fun setData(userList: List<User>) {
+        this.userList = userList
         notifyDataSetChanged()
     }
 
     interface OnContactItemClickListener {
-        fun onContactItemClicked(contacts: AllContacts)
+        fun onContactItemClicked(user: User)
     }
 
 }

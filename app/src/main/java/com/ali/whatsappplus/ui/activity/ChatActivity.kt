@@ -1,11 +1,10 @@
 package com.ali.whatsappplus.ui.activity
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.ali.whatsappplus.data.model.AllContacts
+import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityChatBinding
-import com.ali.whatsappplus.ui.adapter.AllContactsAdapter
+import com.bumptech.glide.Glide
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatBinding
@@ -15,13 +14,20 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val contactName = intent.getStringExtra("name")
-        setContactName(contactName)
+        val userName = intent.getStringExtra("name")
+        val userAvatar = intent.getStringExtra("avatar")
+        setUserData(userName, userAvatar)
     }
 
-    private fun setContactName(contactName: String?) {
+    private fun setUserData(contactName: String?, userAvatar: String?) {
         if (contactName != null){
             binding.contactName.text = contactName
+        }
+
+        if (userAvatar != null){
+            Glide.with(this)
+                .load(userAvatar)
+                .into(binding.profilePic)
         }
     }
 }

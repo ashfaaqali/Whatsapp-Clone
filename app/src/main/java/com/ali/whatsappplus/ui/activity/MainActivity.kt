@@ -11,6 +11,11 @@ import com.ali.whatsappplus.ui.adapter.MainViewPagerAdapter
 import com.ali.whatsappplus.ui.fragment.CallsFragment
 import com.ali.whatsappplus.ui.fragment.RecentChatsFragment
 import com.ali.whatsappplus.ui.fragment.UpdatesFragment
+import com.ali.whatsappplus.util.Constants
+import com.cometchat.chat.core.AppSettings
+import com.cometchat.chat.core.CometChat
+import com.cometchat.chat.exceptions.CometChatException
+import com.cometchat.chat.models.User
 import com.google.android.material.tabs.TabLayout
 
 class MainActivity : AppCompatActivity() {
@@ -18,6 +23,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: MainViewPagerAdapter
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
+    private lateinit var user: User
+    private val uid = "cometchatuser1"
+    private val name = "Khal Drogo"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +33,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setUpTabs()
+        cometChatInit()
+        loginUser()
 
-        binding.newChatButton.setOnClickListener{
+        binding.newChatButton.setOnClickListener {
             navigateToAllContacts()
         }
     }
@@ -34,6 +44,48 @@ class MainActivity : AppCompatActivity() {
     private fun navigateToAllContacts() {
         val intent = Intent(this, ContactsActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun loginUser() {
+
+        CometChat.login(
+            "superhero1",
+            Constants.AUTH_KEY,
+            object : CometChat.CallbackListener<User>() {
+                override fun onSuccess(p0: User?) {
+                    Log.d("Login", "Login Successful : " + p0?.toString())
+                }
+
+                override fun onError(p0: CometChatException?) {
+                    Log.d("Login", "Login failed with exception: " + p0?.message)
+                }
+
+            }
+        )
+    }
+
+    private fun cometChatInit() {
+
+        val appSetting: AppSettings = AppSettings.AppSettingsBuilder()
+            .setRegion(Constants.REGION)
+            .subscribePresenceForAllUsers()
+            .autoEstablishSocketConnection(true)
+            .build();
+
+        CometChat.init(
+            this,
+            Constants.APP_ID,
+            appSetting,
+            object : CometChat.CallbackListener<String>() {
+                override fun onSuccess(p0: String?) {
+                    Log.d("ChatInitSuccess", "Initialization completed successfully")
+                }
+
+                override fun onError(p0: CometChatException?) {
+                    Log.d("ChatInitFailed", "Initialization failed with exception: " + p0?.message)
+                }
+
+            })
     }
 
     private fun setUpTabs() {
