@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     private fun loginUser() {
 
         CometChat.login(
-            "superhero1",
+            "superhero2",
             Constants.AUTH_KEY,
             object : CometChat.CallbackListener<User>() {
                 override fun onSuccess(p0: User?) {

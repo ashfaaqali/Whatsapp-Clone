@@ -1,5 +1,6 @@
 package com.ali.whatsappplus.ui.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,25 +22,24 @@ class ChatAdapter(private var messageList: List<Message>) : RecyclerView.Adapter
     override fun onBindViewHolder(holder: ChatAdapter.MyViewHolder, position: Int) {
         val message = messageList[position]
 
+
         with(holder.binding){
             if (message.source == Constants.SENT){
                 leftChatView.visibility = View.GONE
                 rightChatView.visibility = View.VISIBLE
                 rightChatTextView.text = message.message
+                Log.i("ChatAdapter", "Sent Message: $message")
             } else {
                 rightChatView.visibility = View.GONE
                 leftChatView.visibility = View.VISIBLE
                 leftChatTextView.text = message.message
+                Log.i("ChatAdapter", "Received Message: $message")
+
             }
         }
     }
 
     override fun getItemCount(): Int {
         return messageList.size
-    }
-
-    fun setData(message: List<Message>){
-        this.messageList = message
-        notifyDataSetChanged()
     }
 }

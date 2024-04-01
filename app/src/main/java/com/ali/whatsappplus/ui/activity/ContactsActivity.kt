@@ -46,7 +46,6 @@ class ContactsActivity : AppCompatActivity() {
             }
         })
 
-
         adapter.listener = object : AllContactsAdapter.OnContactItemClickListener{
             override fun onContactItemClicked(user: User) {
                 navigateToChatActivity(user)
@@ -67,6 +66,7 @@ class ContactsActivity : AppCompatActivity() {
         val intent = Intent(this, ChatActivity::class.java)
         intent.putExtra("name", user.name)
         intent.putExtra("avatar", user.avatar)
+        intent.putExtra("receiverId", user.uid)
         startActivity(intent)
     }
 }
