@@ -8,6 +8,7 @@ import androidx.viewpager.widget.ViewPager
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityMainBinding
 import com.ali.whatsappplus.ui.adapter.MainViewPagerAdapter
+import com.ali.whatsappplus.ui.bottomsheet.LoginBottomSheetDialog
 import com.ali.whatsappplus.ui.fragment.CallsFragment
 import com.ali.whatsappplus.ui.fragment.RecentChatsFragment
 import com.ali.whatsappplus.ui.fragment.UpdatesFragment
@@ -24,8 +25,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
     private lateinit var user: User
-    private val uid = "cometchatuser1"
+    private var uid = ""
     private val name = "Khal Drogo"
+    private lateinit var bottomSheetDialog: LoginBottomSheetDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,22 +36,45 @@ class MainActivity : AppCompatActivity() {
 
         setUpTabs()
         cometChatInit()
-        loginUser()
+        loginUser("superhero1")
 
         binding.newChatButton.setOnClickListener {
             navigateToAllContacts()
         }
+
+        binding.options.setOnClickListener {
+            showLoginBottomSheet()
+        }
     }
+
+    fun logoutAndLogin(uid: String) {
+        CometChat.logout(object : CometChat.CallbackListener<String>() {
+            override fun onSuccess(p0: String?) {
+                Log.d("Logout", "Logout Successful $p0")
+                loginUser(uid)
+            }
+
+            override fun onError(p0: CometChatException?) {
+                Log.d("Logout", "Logout failed with exception: " + p0?.message)
+            }
+        })
+    }
+
+    private fun showLoginBottomSheet() {
+        bottomSheetDialog = LoginBottomSheetDialog()
+        bottomSheetDialog.show(supportFragmentManager, "LoginBottomSheet")
+    }
+
 
     private fun navigateToAllContacts() {
         val intent = Intent(this, ContactsActivity::class.java)
         startActivity(intent)
     }
 
-    private fun loginUser() {
+    private fun loginUser(uid: String) {
 
         CometChat.login(
-            "superhero2",
+            uid,
             Constants.AUTH_KEY,
             object : CometChat.CallbackListener<User>() {
                 override fun onSuccess(p0: User?) {
