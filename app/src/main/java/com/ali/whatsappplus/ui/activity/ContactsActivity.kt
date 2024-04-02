@@ -56,10 +56,6 @@ class ContactsActivity : AppCompatActivity() {
         viewModel.loadRecentContactsFromAssets(this, "allContacts.json")
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
-
-//        viewModel.allContacts.observe(this, Observer {
-//            adapter.setData(it)
-//        })
     }
 
     private fun navigateToChatActivity(user: User) {

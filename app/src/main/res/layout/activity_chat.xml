@@ -61,12 +61,12 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/total_contacts"
+                android:id="@+id/status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/online"
                 android:textColor="@color/white"
-                android:textSize="15sp" />
+                android:textSize="13sp" />
 
         </LinearLayout>
 

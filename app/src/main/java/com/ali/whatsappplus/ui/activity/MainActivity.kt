@@ -15,7 +15,11 @@ import com.ali.whatsappplus.ui.fragment.UpdatesFragment
 import com.ali.whatsappplus.util.Constants
 import com.cometchat.chat.core.AppSettings
 import com.cometchat.chat.core.CometChat
+import com.cometchat.chat.core.MessagesRequest
 import com.cometchat.chat.exceptions.CometChatException
+import com.cometchat.chat.models.BaseMessage
+import com.cometchat.chat.models.MediaMessage
+import com.cometchat.chat.models.TextMessage
 import com.cometchat.chat.models.User
 import com.google.android.material.tabs.TabLayout
 
@@ -24,10 +28,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: MainViewPagerAdapter
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
-    private lateinit var user: User
-    private var uid = ""
-    private val name = "Khal Drogo"
+    private var uid = "superhero1"
     private lateinit var bottomSheetDialog: LoginBottomSheetDialog
+    private var TAG = "MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
         setUpTabs()
         cometChatInit()
-        loginUser("superhero1")
+        loginUser(uid)
 
         binding.newChatButton.setOnClickListener {
             navigateToAllContacts()
@@ -50,21 +53,20 @@ class MainActivity : AppCompatActivity() {
     fun logoutAndLogin(uid: String) {
         CometChat.logout(object : CometChat.CallbackListener<String>() {
             override fun onSuccess(p0: String?) {
-                Log.d("Logout", "Logout Successful $p0")
+                Log.d(TAG, "Logout Successful $p0")
                 loginUser(uid)
             }
 
             override fun onError(p0: CometChatException?) {
-                Log.d("Logout", "Logout failed with exception: " + p0?.message)
+                Log.d(TAG, "Logout failed with exception: " + p0?.message)
             }
         })
     }
 
     private fun showLoginBottomSheet() {
         bottomSheetDialog = LoginBottomSheetDialog()
-        bottomSheetDialog.show(supportFragmentManager, "LoginBottomSheet")
+        bottomSheetDialog.show(supportFragmentManager, Constants.BOTTOM_SHEET_TAG)
     }
-
 
     private fun navigateToAllContacts() {
         val intent = Intent(this, ContactsActivity::class.java)
@@ -78,11 +80,11 @@ class MainActivity : AppCompatActivity() {
             Constants.AUTH_KEY,
             object : CometChat.CallbackListener<User>() {
                 override fun onSuccess(p0: User?) {
-                    Log.d("Login", "Login Successful : " + p0?.toString())
+                    Log.d(TAG, "Login Successful : " + p0?.toString())
                 }
 
                 override fun onError(p0: CometChatException?) {
-                    Log.d("Login", "Login failed with exception: " + p0?.message)
+                    Log.d(TAG, "Login failed with exception: " + p0?.message)
                 }
 
             }
@@ -103,14 +105,15 @@ class MainActivity : AppCompatActivity() {
             appSetting,
             object : CometChat.CallbackListener<String>() {
                 override fun onSuccess(p0: String?) {
-                    Log.d("ChatInitSuccess", "Initialization completed successfully")
+                    Log.d(TAG, "CometChat Initialization completed successfully")
                 }
 
                 override fun onError(p0: CometChatException?) {
-                    Log.d("ChatInitFailed", "Initialization failed with exception: " + p0?.message)
+                    Log.d(TAG, "CometChat Initialization failed with exception: " + p0?.message)
                 }
 
-            })
+            }
+        )
     }
 
     private fun setUpTabs() {

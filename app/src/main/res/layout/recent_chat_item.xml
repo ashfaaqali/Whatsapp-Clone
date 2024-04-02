@@ -23,7 +23,7 @@
         android:orientation="vertical">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/contact_name"
+            android:id="@+id/conversation_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/ashfaq"
@@ -41,12 +41,36 @@
 
     </LinearLayout>
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/last_message_time"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:gravity="center"
-        android:text="@string/_5_44_am"/>
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/last_message_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:padding="3dp"
+            android:gravity="center"
+            android:text="@string/_5_44_am"/>
+
+        <TextView
+            android:id="@+id/unread_message_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/unread_messag_txt_bg"
+            android:textColor="@color/white"
+            android:text="10+"
+            android:textStyle="bold"
+            android:textSize="11sp"
+            android:padding="3dp"
+            android:visibility="gone"
+            android:textAlignment="center"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>

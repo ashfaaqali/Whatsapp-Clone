@@ -1,12 +1,23 @@
 package com.ali.whatsappplus.ui.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.ali.whatsappplus.data.model.RecentChats
 import com.ali.whatsappplus.databinding.RecentChatItemBinding
+import com.bumptech.glide.Glide
+import com.cometchat.chat.core.CometChat
+import com.cometchat.chat.models.Conversation
+import com.cometchat.chat.models.Group
+import com.cometchat.chat.models.TextMessage
+import com.cometchat.chat.models.User
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
-class RecentChatsAdapter(private var chatList: List<RecentChats>) :
+class RecentChatsAdapter(private var conversationList: List<Conversation>) :
     RecyclerView.Adapter<RecentChatsAdapter.MyViewHolder>() {
 
     var listener: OnChatItemClickListener? = null
@@ -24,30 +35,78 @@ class RecentChatsAdapter(private var chatList: List<RecentChats>) :
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val chat = chatList[position]
+        val conversation = conversationList[position]
+        Log.i("RecentChatsAdapter", "Conversation: $conversation")
 
-        with(holder.binding){
-            contactName.text = chat.contactName
-            lastMessage.text = chat.lastMessage
-            lastMessageTime.text = chat.timestamp
+        val entity = conversation.conversationWith
+        val message = conversation.lastMessage
+
+        with(holder.binding) {
+
+            if (entity is User) {
+                conversationName.text = entity.name
+                Glide.with(holder.itemView)
+                    .load(entity.avatar)
+                    .into(profilePic)
+            } else if (entity is Group) {
+                conversationName.text = entity.name
+                Glide.with(holder.itemView)
+                    .load(entity.icon)
+                    .into(profilePic)
+            }
+
+            if (message is TextMessage) {
+                lastMessage.text = message.text
+            }
+
+            if (message.sender.uid == CometChat.getLoggedInUser().uid){
+                lastMessageTime.text = formatTime(message.sentAt)
+            } else {
+                lastMessageTime.text = formatTime(message.deliveredToMeAt)
+            }
+
+            if (conversation.unreadMessageCount > 0) {
+                if (conversation.unreadMessageCount in 1..10) {
+                    unreadMessageCount.visibility = View.VISIBLE
+                    unreadMessageCount.text = conversation.unreadMessageCount.toString()
+                } else {
+                    unreadMessageCount.visibility = View.VISIBLE
+                    unreadMessageCount.text = "10+"
+                }
+            } else {
+                unreadMessageCount.visibility = View.GONE
+            }
+
         }
 
-        holder.itemView.setOnClickListener{
-            listener?.onChatItemClicked(chat)
+        holder.itemView.setOnClickListener {
+            if (entity is User) {
+                listener?.onChatItemClicked(entity.name, entity.uid, entity.avatar)
+            }
+            if (entity is Group) {
+                listener?.onChatItemClicked(entity.name, entity.guid, entity.icon)
+            }
         }
     }
+
+    private fun formatTime(milliseconds: Long): String {
+        val sdf = SimpleDateFormat("HH:mm a", Locale.getDefault())
+        sdf.timeZone = TimeZone.getDefault()
+        return sdf.format(Date(milliseconds))
+    }
+
 
     override fun getItemCount(): Int {
-        return chatList.size
+        return conversationList.size
     }
 
-    fun setData(recentChats: List<RecentChats>){
-        this.chatList = recentChats
+    fun setData(conversationList: List<Conversation>) {
+        this.conversationList = conversationList
         notifyDataSetChanged()
     }
 
     interface OnChatItemClickListener {
-        fun onChatItemClicked(chat: RecentChats)
+        fun onChatItemClicked(username: String, uid: String, avatar: String)
     }
 }
 
