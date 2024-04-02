@@ -21,6 +21,7 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
     RecyclerView.Adapter<RecentChatsAdapter.MyViewHolder>() {
 
     var listener: OnChatItemClickListener? = null
+    private var TAG = "RecentChatsAdapter"
 
     inner class MyViewHolder(val binding: RecentChatItemBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -81,10 +82,10 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
 
         holder.itemView.setOnClickListener {
             if (entity is User) {
-                listener?.onChatItemClicked(entity.name, entity.uid, entity.avatar)
+                listener?.onChatItemClicked(entity.name, entity.uid, entity.avatar, conversation.lastMessage.receiverType)
             }
             if (entity is Group) {
-                listener?.onChatItemClicked(entity.name, entity.guid, entity.icon)
+                listener?.onChatItemClicked(entity.name, entity.guid, entity.icon, conversation.lastMessage.receiverType)
             }
         }
     }
@@ -106,7 +107,7 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
     }
 
     interface OnChatItemClickListener {
-        fun onChatItemClicked(username: String, uid: String, avatar: String)
+        fun onChatItemClicked(username: String, uid: String, avatar: String, receiverType: String)
     }
 }
 

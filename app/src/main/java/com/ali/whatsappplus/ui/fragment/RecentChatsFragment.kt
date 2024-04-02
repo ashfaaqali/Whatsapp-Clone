@@ -14,7 +14,6 @@ import com.ali.whatsappplus.databinding.FragmentRecentChatsBinding
 import com.ali.whatsappplus.ui.activity.ChatActivity
 import com.ali.whatsappplus.ui.adapter.RecentChatsAdapter
 import com.ali.whatsappplus.viewmodel.RecentChatsViewModel
-import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.ConversationsRequest
 import com.cometchat.chat.core.ConversationsRequest.ConversationsRequestBuilder
@@ -41,7 +40,12 @@ class RecentChatsFragment : Fragment() {
         adapter = RecentChatsAdapter(emptyList())
 
         adapter.listener = object : RecentChatsAdapter.OnChatItemClickListener {
-            override fun onChatItemClicked(username: String, uid: String, avatar: String) {
+            override fun onChatItemClicked(
+                username: String,
+                uid: String,
+                avatar: String,
+                receiverType: String
+            ) {
                 navigateToChatActivity(username, uid, avatar)
             }
         }

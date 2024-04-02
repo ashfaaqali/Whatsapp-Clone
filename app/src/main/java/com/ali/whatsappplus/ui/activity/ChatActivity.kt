@@ -120,7 +120,8 @@ class ChatActivity : AppCompatActivity() {
             override fun onError(e: CometChatException) {
                 Log.d(
                     TAG,
-                    "Missed Message fetching failed with exception: " + e.message + latestReceivedMessageId)
+                    "Missed Message fetching failed with exception: " + e.message + latestReceivedMessageId
+                )
             }
         })
     }
@@ -170,7 +171,8 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun sendMessage(message: String, receiverId: String) {
-        val receiverType = CometChatConstants.RECEIVER_TYPE_USER
+        val receiverType =
+            if (receiverId == CometChatConstants.RECEIVER_TYPE_USER) CometChatConstants.RECEIVER_TYPE_USER else CometChatConstants.RECEIVER_TYPE_GROUP
         val textMessage = TextMessage(receiverId, message, receiverType)
         messageList.add(textMessage)
         binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount)
