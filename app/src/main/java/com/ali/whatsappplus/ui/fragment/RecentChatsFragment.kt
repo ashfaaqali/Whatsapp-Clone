@@ -55,8 +55,6 @@ class RecentChatsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        fetchConversation()
-
         binding.recentChatsRecyclerView.adapter = adapter
         binding.recentChatsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -71,7 +69,8 @@ class RecentChatsFragment : Fragment() {
                 //Handle List of Conversations
                 if (conversationList != null){
                     Log.i(TAG, " Conversation List: $conversationList")
-                    adapter.setData(conversationList)
+                    val sortedList = conversationList.sortedWith(compareByDescending { it.lastMessage.sentAt })
+                    adapter.setData(sortedList)
                 }
             }
 
@@ -80,6 +79,11 @@ class RecentChatsFragment : Fragment() {
                 Log.i(TAG, "Fetch Conversation List Failed: $exception")
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchConversation()
     }
 
     private fun navigateToChatActivity(
