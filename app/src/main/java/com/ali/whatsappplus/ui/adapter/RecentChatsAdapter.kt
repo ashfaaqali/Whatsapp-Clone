@@ -22,6 +22,7 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
 
     var listener: OnChatItemClickListener? = null
     private var TAG = "RecentChatsAdapter"
+    private var currentUser = CometChat.getLoggedInUser()
 
     inner class MyViewHolder(val binding: RecentChatItemBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -60,7 +61,7 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
                 lastMessage.text = message.text
             }
 
-            if (message.sender.uid == CometChat.getLoggedInUser().uid){
+            if (message.sender == currentUser){
                 lastMessageTime.text = formatTime(message.sentAt)
             } else {
                 lastMessageTime.text = formatTime(message.deliveredToMeAt)
@@ -77,7 +78,6 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
             } else {
                 unreadMessageCount.visibility = View.GONE
             }
-
         }
 
         holder.itemView.setOnClickListener {

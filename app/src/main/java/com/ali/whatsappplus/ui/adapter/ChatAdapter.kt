@@ -17,6 +17,7 @@ import java.util.TimeZone
 class ChatAdapter(private var messageList: List<TextMessage>) : RecyclerView.Adapter<ChatAdapter.MyViewHolder>() {
     private lateinit var binding: ChatItemBinding
     private lateinit var message: TextMessage
+    private var TAG = "ChatAdapter"
 
     inner class MyViewHolder(val binding: ChatItemBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -58,15 +59,5 @@ class ChatAdapter(private var messageList: List<TextMessage>) : RecyclerView.Ada
 
     override fun getItemCount(): Int {
         return messageList.size
-    }
-
-    fun updateMessageStatus(sentAt: Long) {
-        binding.messageStatusIcon.setImageResource(R.drawable.ic_sent)
-        binding.rightChatTimestampTxtView.visibility = View.VISIBLE
-        binding.rightChatTimestampTxtView.text = formatTime(sentAt)
-    }
-
-    fun markMessageAsRead() {
-
     }
 }

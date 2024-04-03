@@ -46,7 +46,7 @@ class RecentChatsFragment : Fragment() {
                 avatar: String,
                 receiverType: String
             ) {
-                navigateToChatActivity(username, uid, avatar)
+                navigateToChatActivity(username, uid, avatar, receiverType)
             }
         }
         return binding.root
@@ -82,11 +82,17 @@ class RecentChatsFragment : Fragment() {
         })
     }
 
-    private fun navigateToChatActivity(name: String, uid: String, avatar: String) {
+    private fun navigateToChatActivity(
+        name: String,
+        uid: String,
+        avatar: String,
+        receiverType: String
+    ) {
         val intent = Intent(requireContext(), ChatActivity::class.java)
         intent.putExtra("name", name)
         intent.putExtra("receiverId", uid)
         intent.putExtra("avatar", avatar)
+        intent.putExtra("receiverType", receiverType)
         startActivity(intent)
     }
 

@@ -63,7 +63,6 @@
             android:layout_height="wrap_content"
             android:textColor="#686868"
             android:gravity="center"
-            android:visibility="gone"
             android:layout_gravity="bottom"
             android:text="6:40 am"
             android:padding="2dp"
@@ -73,6 +72,7 @@
             android:id="@+id/message_status_icon"
             android:layout_width="15dp"
             android:layout_height="15dp"
+            android:visibility="gone"
             android:padding="2dp"
             android:src="@drawable/ic_time"
             android:layout_gravity="bottom"/>

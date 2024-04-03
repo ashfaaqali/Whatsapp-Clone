@@ -22,6 +22,7 @@ import com.cometchat.chat.exceptions.CometChatException
 import com.cometchat.chat.models.BaseMessage
 import com.cometchat.chat.models.CustomMessage
 import com.cometchat.chat.models.MediaMessage
+import com.cometchat.chat.models.MessageReceipt
 import com.cometchat.chat.models.TextMessage
 import com.cometchat.chat.models.TypingIndicator
 
@@ -33,6 +34,7 @@ class ChatActivity : AppCompatActivity() {
     private val messageList = mutableListOf<TextMessage>()
     private lateinit var typingIndicator: TypingIndicator
     private var receiverId = ""
+    private var receiverType = ""
     private var userName = ""
     private var userAvatar = ""
 
@@ -79,14 +81,13 @@ class ChatActivity : AppCompatActivity() {
         setUserData()
         setupRecyclerView()
         messageListener()
-        messageDelivery()
         fetchMissedMessages()
 
         binding.messageEditText.addTextChangedListener(mTextEditorWatcher)
 
         binding.voiceRecorderAndSendBtn.setOnClickListener {
             val message = binding.messageEditText.text.toString()
-            sendMessage(message, receiverId)
+            sendMessage(message)
             binding.messageEditText.setText("")
         }
     }
@@ -126,16 +127,16 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
-    private fun messageDelivery() {
-//        CometChat.markAsDelivered(message.id, receiverUID, CometChatConstants.RECEIVER_TYPE_USER, message.sender.uid, object : CallbackListener<Void?>() {
-//            override fun onSuccess(unused: Void?) {
-//                Log.e(TAG, "markAsDelivered : " + "Success")
-//            }
-//
-//            override fun onError(e: CometChatException) {
-//                Log.e(TAG, "markAsDelivered : " + e.message)
-//            }
-//        })
+    private fun messageDelivery(textMessage: TextMessage) {
+        CometChat.markAsDelivered(textMessage.id, textMessage.receiverUid, textMessage.receiverType, textMessage.sender.uid, object : CallbackListener<Void?>() {
+            override fun onSuccess(unused: Void?) {
+                Log.e(TAG, "markAsDelivered Success [$textMessage]")
+            }
+
+            override fun onError(e: CometChatException) {
+                Log.e(TAG, "markAsDelivered : " + e.message)
+            }
+        })
     }
 
     private fun messageListener() {
@@ -150,6 +151,14 @@ class ChatActivity : AppCompatActivity() {
                 binding.status.text = "Typing..."
             }
 
+            override fun onMessagesDelivered(messageReceipt: MessageReceipt) {
+
+            }
+
+            override fun onMessagesRead(messageReceipt: MessageReceipt) {
+                Log.e(TAG, "onMessagesRead: $messageReceipt")
+            }
+
         })
     }
 
@@ -158,6 +167,7 @@ class ChatActivity : AppCompatActivity() {
             userName = intent.getStringExtra("name").toString()
             userAvatar = intent.getStringExtra("avatar").toString()
             receiverId = intent.getStringExtra("receiverId").toString()
+            receiverType = intent.getStringExtra("receiverType").toString()
         } else {
             Toast.makeText(applicationContext, "Error Loading Data", Toast.LENGTH_SHORT).show()
         }
@@ -170,9 +180,9 @@ class ChatActivity : AppCompatActivity() {
         binding.chatMessagesRecyclerView.layoutManager = layoutManager
     }
 
-    private fun sendMessage(message: String, receiverId: String) {
+    private fun sendMessage(message: String) {
         val receiverType =
-            if (receiverId == CometChatConstants.RECEIVER_TYPE_USER) CometChatConstants.RECEIVER_TYPE_USER else CometChatConstants.RECEIVER_TYPE_GROUP
+            if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) CometChatConstants.RECEIVER_TYPE_USER else CometChatConstants.RECEIVER_TYPE_GROUP
         val textMessage = TextMessage(receiverId, message, receiverType)
         messageList.add(textMessage)
         binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount)
@@ -181,9 +191,8 @@ class ChatActivity : AppCompatActivity() {
         textMessage.receiverUid
         CometChat.sendMessage(textMessage, object : CallbackListener<TextMessage>() {
             override fun onSuccess(message: TextMessage) {
-                message.sentAt = System.currentTimeMillis()
-                chatAdapter.updateMessageStatus(message.sentAt)
-                Log.i(TAG, "Message Sent Success: ${message.sentAt}")
+                Log.i(TAG, "Message Sent Success: $message")
+                messageDelivery(message)
             }
 
             override fun onError(p0: CometChatException?) {
@@ -207,6 +216,7 @@ class ChatActivity : AppCompatActivity() {
         CometChat.addMessageListener(listenerID, object : CometChat.MessageListener() {
             override fun onTextMessageReceived(textMessage: TextMessage) {
                 Log.d(TAG, "Text message received successfully: $textMessage")
+                messageDelivery(textMessage)
                 messageList.add(textMessage)
                 binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount)
                 chatAdapter.notifyDataSetChanged()
