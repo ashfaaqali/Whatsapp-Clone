@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         CometChat.logout(object : CometChat.CallbackListener<String>() {
             override fun onSuccess(p0: String?) {
                 Log.d(TAG, "Logout Successful $p0")
+                recreate()
                 loginUser(uid)
             }
 
