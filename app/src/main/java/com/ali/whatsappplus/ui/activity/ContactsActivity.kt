@@ -53,7 +53,6 @@ class ContactsActivity : AppCompatActivity() {
         }
 
         viewModel = ViewModelProvider(this)[AllContactsViewModel::class.java]
-        viewModel.loadRecentContactsFromAssets(this, "allContacts.json")
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
     }
