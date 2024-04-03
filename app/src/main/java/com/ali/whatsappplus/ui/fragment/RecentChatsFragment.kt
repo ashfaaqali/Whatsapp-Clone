@@ -18,13 +18,17 @@ import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.ConversationsRequest
 import com.cometchat.chat.core.ConversationsRequest.ConversationsRequestBuilder
 import com.cometchat.chat.exceptions.CometChatException
+import com.cometchat.chat.helpers.CometChatHelper
 import com.cometchat.chat.models.Conversation
+import com.cometchat.chat.models.CustomMessage
+import com.cometchat.chat.models.MediaMessage
+import com.cometchat.chat.models.TextMessage
 
 class RecentChatsFragment : Fragment() {
     private lateinit var binding: FragmentRecentChatsBinding
     private lateinit var viewModel: RecentChatsViewModel
     private lateinit var adapter: RecentChatsAdapter
-
+    private lateinit var sortedConversationList: List<Conversation>
     private lateinit var conversationsRequest: ConversationsRequest
 
     private val TAG = "RecentChatsFragment"
@@ -32,13 +36,10 @@ class RecentChatsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         binding = FragmentRecentChatsBinding.inflate(layoutInflater)
-
         viewModel = ViewModelProvider(this)[RecentChatsViewModel::class.java]
-
         adapter = RecentChatsAdapter(emptyList())
-
+        // Handling Item Click
         adapter.listener = object : RecentChatsAdapter.OnChatItemClickListener {
             override fun onChatItemClicked(
                 username: String,
@@ -54,7 +55,8 @@ class RecentChatsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        // Real-Time Message Listener
+        realTimeMessageListener()
         binding.recentChatsRecyclerView.adapter = adapter
         binding.recentChatsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -69,8 +71,8 @@ class RecentChatsFragment : Fragment() {
                 //Handle List of Conversations
                 if (conversationList != null){
                     Log.i(TAG, " Conversation List: $conversationList")
-                    val sortedList = conversationList.sortedWith(compareByDescending { it.lastMessage.sentAt })
-                    adapter.setData(sortedList)
+                    sortedConversationList = conversationList.sortedWith(compareByDescending { it.lastMessage.sentAt })
+                    adapter.setData(sortedConversationList)
                 }
             }
 
@@ -81,8 +83,40 @@ class RecentChatsFragment : Fragment() {
         })
     }
 
+    private fun realTimeMessageListener() {
+        val listenerID = TAG
+        CometChat.addMessageListener(listenerID, object : CometChat.MessageListener() {
+            override fun onTextMessageReceived(textMessage: TextMessage) {
+                Log.d(TAG, "Realtime text message received successfully: $textMessage")
+                // Get the conversation associated with the received message
+                val conversation = CometChatHelper.getConversationFromMessage(textMessage)
+                // Update the conversation list with the new/updated conversation
+                val updatedList = sortedConversationList.toMutableList()
+                val existingIndex = updatedList.indexOfFirst { it.conversationId == conversation.conversationId }
+                if (existingIndex != -1) {
+                    updatedList[existingIndex] = conversation // Update existing conversation
+                } else {
+                    updatedList.add(conversation) // Add new conversation
+                }
+                // Sort the conversation list based on the latest message time
+                sortedConversationList = updatedList.sortedByDescending { it.lastMessage.sentAt }
+                // Update the adapter with the sorted conversation list
+                adapter.setData(sortedConversationList)
+            }
+
+            override fun onMediaMessageReceived(mediaMessage: MediaMessage) {
+                Log.d(TAG, "Media message received successfully: $mediaMessage")
+            }
+
+            override fun onCustomMessageReceived(customMessage: CustomMessage) {
+                Log.d(TAG, "Custom message received successfully: $customMessage")
+            }
+        })
+    }
+
     override fun onResume() {
         super.onResume()
+        // Fetch Conversations
         fetchConversation()
     }
 
