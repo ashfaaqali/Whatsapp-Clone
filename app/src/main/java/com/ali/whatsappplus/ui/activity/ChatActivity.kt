@@ -82,6 +82,7 @@ class ChatActivity : AppCompatActivity() {
         setupRecyclerView()
         messageListener()
         fetchMissedMessages()
+        fetchUnreadMessages()
 
         binding.messageEditText.addTextChangedListener(mTextEditorWatcher)
 
@@ -237,5 +238,32 @@ class ChatActivity : AppCompatActivity() {
         Glide.with(this)
             .load(userAvatar)
             .into(binding.profilePic)
+    }
+
+    private fun fetchUnreadMessages(){
+        messagesRequest = MessagesRequest.MessagesRequestBuilder()
+            .setUnread(true)
+            .setLimit(20)
+            .setUID(receiverId)
+            .build()
+
+        messagesRequest.fetchPrevious(object : CallbackListener<List<BaseMessage?>>() {
+            override fun onSuccess(list: List<BaseMessage?>) {
+                for (message in list) {
+                    if (message is TextMessage) {
+                        Log.d(TAG, "Text message received successfully: $message")
+                        messageList.add(message)
+                        binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount)
+                        chatAdapter.notifyDataSetChanged()
+                    } else if (message is MediaMessage) {
+                        Log.d(TAG, "Media message received successfully: $message")
+                    }
+                }
+            }
+
+            override fun onError(e: CometChatException) {
+                Log.d(TAG, "Message fetching failed with exception: " + e.message)
+            }
+        })
     }
 }
