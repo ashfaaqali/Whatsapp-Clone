@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.WhatsappPlus" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.WhatsappPlus" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">#075E54</item> <!-- WhatsApp's green color -->
         <item name="colorPrimaryDark">#075E54</item> <!-- WhatsApp's green color -->
