@@ -241,11 +241,19 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun fetchUnreadMessages(){
-        messagesRequest = MessagesRequest.MessagesRequestBuilder()
-            .setUnread(true)
-            .setLimit(20)
-            .setUID(receiverId)
-            .build()
+        messagesRequest = if (receiverType == CometChatConstants.RECEIVER_TYPE_USER){
+            MessagesRequest.MessagesRequestBuilder()
+                .setUnread(true)
+                .setLimit(20)
+                .setUID(receiverId)
+                .build()
+        } else {
+            MessagesRequest.MessagesRequestBuilder()
+                .setUnread(true)
+                .setLimit(20)
+                .setGUID(receiverId)
+                .build()
+        }
 
         messagesRequest.fetchPrevious(object : CallbackListener<List<BaseMessage?>>() {
             override fun onSuccess(list: List<BaseMessage?>) {
