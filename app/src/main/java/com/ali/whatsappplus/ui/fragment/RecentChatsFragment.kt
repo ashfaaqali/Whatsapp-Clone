@@ -56,7 +56,7 @@ class RecentChatsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Real-Time Message Listener
-        realTimeMessageListener()
+        messageListener()
         binding.recentChatsRecyclerView.adapter = adapter
         binding.recentChatsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -83,7 +83,7 @@ class RecentChatsFragment : Fragment() {
         })
     }
 
-    private fun realTimeMessageListener() {
+    private fun messageListener() {
         val listenerID = TAG
         CometChat.addMessageListener(listenerID, object : CometChat.MessageListener() {
             override fun onTextMessageReceived(textMessage: TextMessage) {
