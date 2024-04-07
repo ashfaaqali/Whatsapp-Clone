@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ali.whatsappplus.databinding.ActivityContactsBinding
@@ -36,6 +37,7 @@ class ContactsActivity : AppCompatActivity() {
         usersRequest.fetchNext(object : CometChat.CallbackListener<List<User>>(){
             override fun onSuccess(userList: List<User>?) {
                 if (userList != null){
+                    stopShimmer()
                     adapter.setData(userList)
                     Log.i(TAG, "User List: $userList")
                 }
@@ -55,6 +57,16 @@ class ContactsActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[AllContactsViewModel::class.java]
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun stopShimmer() {
+        binding.shimmer.stopShimmer()
+        binding.shimmer.visibility = View.GONE
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.shimmer.startShimmer()
     }
 
     private fun navigateToChatActivity(user: User) {
