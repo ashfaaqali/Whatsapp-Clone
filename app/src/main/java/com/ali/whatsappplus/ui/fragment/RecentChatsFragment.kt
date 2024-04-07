@@ -70,6 +70,7 @@ class RecentChatsFragment : Fragment() {
             override fun onSuccess(conversationList: List<Conversation>?) {
                 //Handle List of Conversations
                 if (conversationList != null){
+                    stopShimmer()
                     Log.i(TAG, " Conversation List: $conversationList")
                     sortedConversationList = conversationList.sortedWith(compareByDescending { it.lastMessage.sentAt })
                     adapter.setData(sortedConversationList)
@@ -81,6 +82,11 @@ class RecentChatsFragment : Fragment() {
                 Log.i(TAG, "Fetch Conversation List Failed: $exception")
             }
         })
+    }
+
+    private fun stopShimmer() {
+        binding.shimmer.stopShimmer()
+        binding.shimmer.visibility = View.GONE
     }
 
     private fun messageListener() {
@@ -118,6 +124,7 @@ class RecentChatsFragment : Fragment() {
         super.onResume()
         // Fetch Conversations
         fetchConversation()
+        binding.shimmer.startShimmer()
     }
 
     private fun navigateToChatActivity(
