@@ -22,4 +22,5 @@
     <string name="attachment">Attachment</string>
     <string name="message">Message</string>
     <string name="online">online</string>
+    <string name="end_to_end_encrypted">End-to-end encrypted</string>
 </resources>
