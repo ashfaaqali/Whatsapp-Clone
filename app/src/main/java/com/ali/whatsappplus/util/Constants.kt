@@ -5,4 +5,5 @@ object Constants {
     const val REGION = "IN"
     const val AUTH_KEY = "032076726b4ef66929857fb28e019d5dc8f00436"
     const val BOTTOM_SHEET_TAG = "LOGIN_BOTTOM_SHEET_DIALOG"
+    const val PICK_IMAGE_REQUEST = 0
 }
