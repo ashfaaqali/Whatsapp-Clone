@@ -1,23 +1,30 @@
 package com.ali.whatsappplus.ui.activity
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityChatBinding
 import com.ali.whatsappplus.ui.adapter.ChatAdapter
-import com.ali.whatsappplus.viewmodel.ChatViewModel
+import com.ali.whatsappplus.util.Constants.PICK_IMAGE_REQUEST
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.CometChat.CallbackListener
 import com.cometchat.chat.core.CometChat.endTyping
+import com.cometchat.chat.core.CometChat.markAsDelivered
 import com.cometchat.chat.core.CometChat.markAsRead
+import com.cometchat.chat.core.CometChat.sendMediaMessage
 import com.cometchat.chat.core.CometChat.startTyping
 import com.cometchat.chat.core.MessagesRequest
 import com.cometchat.chat.exceptions.CometChatException
@@ -27,6 +34,14 @@ import com.cometchat.chat.models.MediaMessage
 import com.cometchat.chat.models.MessageReceipt
 import com.cometchat.chat.models.TextMessage
 import com.cometchat.chat.models.TypingIndicator
+import okhttp3.internal.notifyAll
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatBinding
@@ -41,7 +56,6 @@ class ChatActivity : AppCompatActivity() {
     private var hasNoMoreMessages = false
     private var isInProgress = false
     private lateinit var layoutManager: LinearLayoutManager
-
     private var messagesRequest: MessagesRequest? = null
     private var latestReceivedMessageId = 0
 
@@ -74,11 +88,23 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    private val imagePickerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                val selectedImageUri = result.data?.data
+                if (selectedImageUri != null) {
+                    val file = createFileFromUri(selectedImageUri)
+                    Log.i(TAG, file.toString())
+                    if (file != null) sendMediaMessage(file)
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        chatAdapter = ChatAdapter(messageList)
+        chatAdapter = ChatAdapter(this, messageList)
 
         handleIntentData()
         setUserData()
@@ -91,22 +117,73 @@ class ChatActivity : AppCompatActivity() {
 
         binding.voiceRecorderAndSendBtn.setOnClickListener {
             val message = binding.messageEditText.text.toString()
-            sendMessage(message)
-            binding.messageEditText.setText("")
+            if (message.isNotEmpty()) {
+                sendMessage(message)
+                binding.messageEditText.setText("")
+            }
+        }
+
+        binding.attachmentBtn.setOnClickListener {
+            openImagePicker()
+        }
+
+        binding.voiceCall.setOnClickListener {
+            navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType)
         }
     }
+
+    private fun openImagePicker() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "image/*"
+        imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"))
+    }
+
+    private fun createFileFromUri(uri: Uri): File? {
+        val contentResolver = this.contentResolver
+        val inputStream: InputStream? = contentResolver.openInputStream(uri)
+        inputStream?.let { inputStream1 ->
+            val file = createImageFile()
+            try {
+                val outputStream = FileOutputStream(file)
+                val buffer = ByteArray(4 * 1024) // or other buffer size
+                var read: Int
+                while (inputStream1.read(buffer).also { read = it } != -1) {
+                    outputStream.write(buffer, 0, read)
+                }
+                outputStream.flush()
+                outputStream.close()
+                inputStream.close()
+                return file
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }
+        return null
+    }
+
+    private fun createImageFile(): File {
+        val timeStamp: String =
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir: File? = this.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        )
+    }
+
 
     private fun fetchMessage() {
 
         if (messagesRequest == null) {
             messagesRequest = if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) {
                 MessagesRequest.MessagesRequestBuilder()
-                    .setLimit(30)
+                    .setLimit(10)
                     .setUID(receiverId)
                     .build()
             } else {
                 MessagesRequest.MessagesRequestBuilder()
-                    .setLimit(30)
+                    .setLimit(10)
                     .setGUID(receiverId)
                     .build()
             }
@@ -114,20 +191,20 @@ class ChatActivity : AppCompatActivity() {
 
         messagesRequest?.fetchPrevious(object : CallbackListener<List<BaseMessage>>() {
             override fun onSuccess(baseMessages: List<BaseMessage>) {
-                for (message in baseMessages) {
-                    if (message is TextMessage) {
-                        Log.d(TAG, "Message history fetched successfully: $message")
-                    } else if (message is MediaMessage) {
-                        Log.d(TAG, "Media message history fetched successfully: $message")
-                    }
-                }
+
+//                for (message in baseMessages) {
+//                    if (message is TextMessage) {
+//                        Log.d(TAG, "Message history fetched successfully: $message")
+//                    } else if (message is MediaMessage) {
+//                        Log.d(TAG, "Media message history fetched successfully: $message")
+//                    }
+//                }
 
                 isInProgress = false
                 chatAdapter.updateList(baseMessages)
+
                 // Calculate the number of items added
-
                 val itemsAdded = baseMessages.size
-
                 if (itemsAdded > 0) {
                     binding.chatMessagesRecyclerView.scrollToPosition(itemsAdded)
                 }
@@ -148,17 +225,23 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
+    private fun scrollToBottom() {
+        if (chatAdapter.itemCount > 0) {
+            binding.chatMessagesRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+        }
+    }
+
     private fun sendMessage(message: String) {
         val receiverType =
             if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) CometChatConstants.RECEIVER_TYPE_USER else CometChatConstants.RECEIVER_TYPE_GROUP
         val textMessage = TextMessage(receiverId, message, receiverType)
         chatAdapter.addMessage(textMessage)
-        binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
         textMessage.sender = CometChat.getLoggedInUser()
+        textMessage.sentAt = System.currentTimeMillis()
+        binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
         CometChat.sendMessage(textMessage, object : CallbackListener<TextMessage>() {
             override fun onSuccess(message: TextMessage) {
                 Log.i(TAG, "Message Sent Success: $message")
-                chatAdapter.updateSentMessage(message)
             }
 
             override fun onError(p0: CometChatException?) {
@@ -167,17 +250,59 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
+    private fun sendMediaMessage(file: File) {
+
+        val mediaMessage =
+            if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) MediaMessage(
+                receiverId,
+                file,
+                CometChatConstants.MESSAGE_TYPE_IMAGE,
+                CometChatConstants.RECEIVER_TYPE_USER
+            ) else MediaMessage(
+                receiverId,
+                file,
+                CometChatConstants.MESSAGE_TYPE_IMAGE,
+                CometChatConstants.RECEIVER_TYPE_GROUP
+            )
+        mediaMessage.sender = CometChat.getLoggedInUser()
+        sendMediaMessage(mediaMessage, object : CallbackListener<MediaMessage>() {
+            override fun onSuccess(p0: MediaMessage) {
+                chatAdapter.addMessage(p0)
+                scrollToBottom()
+                Log.i(TAG, "sendMediaMessage OnSuccess: $p0")
+            }
+
+            override fun onError(p0: CometChatException?) {
+                Log.e(TAG, "sendMediaMessage OnError: $p0")
+            }
+
+        })
+    }
+
     private fun messageListener() {
         CometChat.addMessageListener(TAG, object : CometChat.MessageListener() {
             override fun onTextMessageReceived(textMessage: TextMessage?) {
                 if (textMessage != null) {
+                    textMessage.deliveredAt = System.currentTimeMillis()
+                    textMessage.readAt = System.currentTimeMillis()
+                    markAsDelivered(textMessage)
+                    markAsRead(textMessage)
                     chatAdapter.addMessage(textMessage)
+                    Log.i(TAG, "onTextMessageReceived: $textMessage")
                     binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
                 }
             }
 
-            override fun onMediaMessageReceived(p0: MediaMessage?) {
-
+            override fun onMediaMessageReceived(mediaMessage: MediaMessage?) {
+                Log.i(TAG, "onMediaMessageReceived: ${mediaMessage?.file}")
+                if (mediaMessage != null) {
+                    mediaMessage.deliveredAt = System.currentTimeMillis()
+                    mediaMessage.readAt = System.currentTimeMillis()
+                    markAsDelivered(mediaMessage)
+                    markAsRead(mediaMessage)
+                    chatAdapter.addMessage(mediaMessage)
+                    binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                }
             }
 
             override fun onCustomMessageReceived(p0: CustomMessage?) {
@@ -194,14 +319,26 @@ class ChatActivity : AppCompatActivity() {
                 binding.status.text = "Typing..."
             }
 
-            override fun onMessagesDelivered(messageDeliveryReceipt: MessageReceipt?) {
-
+            override fun onMessagesDelivered(messageDeliveryReceipt: MessageReceipt) {
+                Log.d(TAG, "onMessageDelivered: $messageDeliveryReceipt")
             }
 
             override fun onMessagesRead(messageReadReceipt: MessageReceipt?) {
 
             }
 
+        })
+    }
+
+    private fun markMessageAsRead(message: BaseMessage) {
+        markAsRead(message, object : CallbackListener<Void?>() {
+            override fun onSuccess(unused: Void?) {
+                Log.e(TAG, "markAsRead : " + "success")
+            }
+
+            override fun onError(e: CometChatException) {
+                Log.e(TAG, "markAsRead : " + e.message)
+            }
         })
     }
 
@@ -232,24 +369,6 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
-    private fun messageDelivery(textMessage: TextMessage) {
-        CometChat.markAsDelivered(
-            textMessage.id,
-            textMessage.receiverUid,
-            textMessage.receiverType,
-            textMessage.sender.uid,
-            object : CallbackListener<Void?>() {
-                override fun onSuccess(unused: Void?) {
-                    Log.e(TAG, "markAsDelivered Success [$textMessage]")
-                }
-
-                override fun onError(e: CometChatException) {
-                    Log.e(TAG, "markAsDelivered : " + e.message)
-                }
-            }
-        )
-    }
-
     private fun handleIntentData() {
         if (intent != null) {
             userName = intent.getStringExtra("name").toString()
@@ -267,12 +386,15 @@ class ChatActivity : AppCompatActivity() {
         binding.chatMessagesRecyclerView.layoutManager = layoutManager
         binding.chatMessagesRecyclerView.adapter = chatAdapter
 
-        // Add scroll listener to RecyclerView
+        // Add scroll listener to RecyclerView to fetch next next list of messages.
         binding.chatMessagesRecyclerView.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!hasNoMoreMessages && !isInProgress) {
-                    if (layoutManager.findFirstVisibleItemPosition() == 10 || !binding.chatMessagesRecyclerView.canScrollVertically(-1)) {
+                    if (!binding.chatMessagesRecyclerView.canScrollVertically(
+                            -1
+                        )
+                    ) {
                         isInProgress = true
                         fetchMessage()
                     }
@@ -296,5 +418,19 @@ class ChatActivity : AppCompatActivity() {
         Glide.with(this)
             .load(userAvatar)
             .into(binding.profilePic)
+    }
+
+    private fun navigateToVoiceCallActivity(
+        name: String,
+        uid: String,
+        avatar: String,
+        receiverType: String
+    ) {
+        val intent = Intent(this, VoiceCall::class.java)
+        intent.putExtra("name", name)
+        intent.putExtra("receiverId", uid)
+        intent.putExtra("avatar", avatar)
+        intent.putExtra("receiverType", receiverType)
+        startActivity(intent)
     }
 }
