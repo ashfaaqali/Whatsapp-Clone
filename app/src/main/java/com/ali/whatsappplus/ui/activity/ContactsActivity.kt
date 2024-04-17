@@ -1,15 +1,13 @@
 package com.ali.whatsappplus.ui.activity
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ali.whatsappplus.databinding.ActivityContactsBinding
 import com.ali.whatsappplus.ui.adapter.AllContactsAdapter
-import com.ali.whatsappplus.viewmodel.AllContactsViewModel
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.UsersRequest
 import com.cometchat.chat.core.UsersRequest.UsersRequestBuilder
@@ -20,7 +18,6 @@ class ContactsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityContactsBinding
     private lateinit var adapter: AllContactsAdapter
-    private lateinit var viewModel: AllContactsViewModel
     private lateinit var usersRequest: UsersRequest
     private val TAG = "ContactsActivity"
 
@@ -28,8 +25,10 @@ class ContactsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityContactsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        adapter = AllContactsAdapter(emptyList())
 
+        recyclerViewSetup()
+
+        // Request For Users
         usersRequest = UsersRequestBuilder()
             .setLimit(30)
             .build()
@@ -48,13 +47,16 @@ class ContactsActivity : AppCompatActivity() {
             }
         })
 
+        // Click listener for contacts
         adapter.listener = object : AllContactsAdapter.OnContactItemClickListener{
             override fun onContactItemClicked(user: User) {
                 navigateToChatActivity(user)
             }
         }
+    }
 
-        viewModel = ViewModelProvider(this)[AllContactsViewModel::class.java]
+    private fun recyclerViewSetup() {
+        adapter = AllContactsAdapter(emptyList())
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
     }

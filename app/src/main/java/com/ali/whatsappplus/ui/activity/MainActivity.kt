@@ -37,7 +37,10 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Tab Layout And ViewPager Setup
         setUpTabs()
+
+        //CometChat Initialization, Login
         cometChatInit()
         loginUser(uid)
 
@@ -45,11 +48,13 @@ class MainActivity : AppCompatActivity() {
             navigateToAllContacts()
         }
 
+        // BottomSheet Invocation
         binding.options.setOnClickListener {
             showLoginBottomSheet()
         }
     }
 
+    // Invoked when account is switched
     fun logoutAndLogin(uid: String) {
         CometChat.logout(object : CometChat.CallbackListener<String>() {
             override fun onSuccess(p0: String?) {
@@ -74,7 +79,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loginUser(uid: String) {
-
         CometChat.login(
             uid,
             Constants.AUTH_KEY,
@@ -92,7 +96,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun cometChatInit() {
-
         val appSetting: AppSettings = AppSettings.AppSettingsBuilder()
             .setRegion(Constants.REGION)
             .subscribePresenceForAllUsers()
@@ -119,7 +122,6 @@ class MainActivity : AppCompatActivity() {
     private fun setUpTabs() {
         tabLayout = findViewById(R.id.tab_layout)
         viewPager = findViewById(R.id.view_pager)
-
         adapter = MainViewPagerAdapter(supportFragmentManager)
 
         adapter.addFragment(RecentChatsFragment(), "Chats")

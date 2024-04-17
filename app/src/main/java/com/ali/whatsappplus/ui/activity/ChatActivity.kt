@@ -82,6 +82,7 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    // Typing Indicator To Notify The Other User Of Typing Status
     private fun sendTypingIndicator(isTyping: Boolean) {
         typingIndicator = TypingIndicator(receiverId, CometChatConstants.RECEIVER_TYPE_USER)
         if (isTyping) {
@@ -131,6 +132,7 @@ class ChatActivity : AppCompatActivity() {
             showAttachmentsBottomSheet()
         }
 
+        // Initiate Voice Call
         binding.voiceCall.setOnClickListener {
             navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType)
         }
@@ -141,17 +143,19 @@ class ChatActivity : AppCompatActivity() {
         bottomSheetDialog.show(supportFragmentManager, Constants.ATTACHMENTS_BOTTOM_SHEET_TAG)
     }
 
+    // Image Picker Intent
     private fun openImagePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"))
     }
 
+    // Create File object from URI
     private fun createFileFromUri(uri: Uri): File? {
         val contentResolver = this.contentResolver
         val inputStream: InputStream? = contentResolver.openInputStream(uri)
         inputStream?.let { inputStream1 ->
-            val file = createImageFile()
+            val file = createImageFile() // Create Image File To Display In The Chat
             try {
                 val outputStream = FileOutputStream(file)
                 val buffer = ByteArray(4 * 1024) // or other buffer size
@@ -252,7 +256,6 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun sendMediaMessage(file: File) {
-
         val mediaMessage =
             if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) MediaMessage(
                 receiverId,
@@ -280,7 +283,7 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
-    private fun messageListener() {
+    private fun triggerListeners() {
         CometChat.addMessageListener(TAG, object : CometChat.MessageListener() {
             override fun onTextMessageReceived(textMessage: TextMessage?) {
                 if (textMessage != null) {
@@ -406,14 +409,17 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        messageListener()
+        // This method triggers listeners for Messages, Typing Indicators, Messages Delivered & Messages Read.
+        triggerListeners()
     }
 
     override fun onPause() {
         super.onPause()
+        // Removing the message listener when not in use.
         CometChat.removeMessageListener(TAG)
     }
 
+    // Set user data (Profile picture, name etc)
     private fun setUserData() {
         binding.contactName.text = userName
         Glide.with(this)

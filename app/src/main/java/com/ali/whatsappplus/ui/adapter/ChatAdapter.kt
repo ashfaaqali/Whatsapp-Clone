@@ -35,13 +35,37 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         setMessageList(baseMessages)
     }
 
+    // Setting messages list to the recycler view
     private fun setMessageList(messageList: List<BaseMessage>) {
         Log.d(TAG, "setMessagesList called: $messageList")
         this.messageList.addAll(0, messageList)
         notifyItemRangeInserted(0, messageList.size)
     }
 
+    override fun getItemViewType(position: Int): Int {
+        val baseMessage = messageList[position]
+
+        val loggedInUser = CometChat.getLoggedInUser().uid
+        val sender = baseMessage.sender.uid
+
+        // Checking and returning view type to OnCreateViewHolder
+        return when (baseMessage.type) {
+            CometChatConstants.MESSAGE_TYPE_TEXT -> {
+                if (sender == loggedInUser) Constants.RIGHT_CHAT_TEXT_VIEW
+                else Constants.LEFT_CHAT_TEXT_VIEW
+            }
+
+            CometChatConstants.MESSAGE_TYPE_IMAGE -> {
+                if (sender == loggedInUser) Constants.RIGHT_CHAT_IMAGE_VIEW
+                else Constants.LEFT_CHAT_IMAGE_VIEW
+            }
+
+            else -> -1
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        // Returning the appropriate view according to the ItemViewType
         return when (viewType) {
             Constants.LEFT_CHAT_TEXT_VIEW -> {
                 val layoutInflater = LayoutInflater.from(parent.context)
@@ -85,36 +109,17 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
-        val baseMessage = messageList[position]
-
-        val loggedInUser = CometChat.getLoggedInUser().uid
-        val sender = baseMessage.sender.uid
-
-        return when (baseMessage.type) {
-            CometChatConstants.MESSAGE_TYPE_TEXT -> {
-                if (sender == loggedInUser) Constants.RIGHT_CHAT_TEXT_VIEW
-                else Constants.LEFT_CHAT_TEXT_VIEW
-            }
-
-            CometChatConstants.MESSAGE_TYPE_IMAGE -> {
-                if (sender == loggedInUser) Constants.RIGHT_CHAT_IMAGE_VIEW
-                else Constants.LEFT_CHAT_IMAGE_VIEW
-            }
-
-            else -> -1
-        }
-    }
-
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
         val baseMessage = messageList[position]
 
+        // Setting the data to the views according to the view type
         when (viewHolder.itemViewType) {
             Constants.LEFT_CHAT_TEXT_VIEW -> setTextData(viewHolder as LeftChatTextView, position)
             Constants.RIGHT_CHAT_TEXT_VIEW -> setTextData(viewHolder as RightChatTextView, position)
             Constants.LEFT_CHAT_IMAGE_VIEW -> setImageData(viewHolder as LeftChatImageView, position)
             Constants.RIGHT_CHAT_IMAGE_VIEW -> setImageData(viewHolder as RightChatImageView, position)
         }
+        // Setting the message status icon (sent/delivered/read)
 //        setStatusIcon(baseMessage)
     }
 
@@ -150,6 +155,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         setMessageList(baseMessageList)
     }
 
+    // Get message timestamp
     private fun getTimestamp(milliSeconds: Long): String {
         val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
         val date = Date(milliSeconds)

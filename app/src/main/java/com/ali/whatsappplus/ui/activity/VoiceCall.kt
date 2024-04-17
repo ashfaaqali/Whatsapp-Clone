@@ -29,7 +29,7 @@ class VoiceCall : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityVoiceCallBinding.inflate(layoutInflater)
-        statusBarTransparent()
+        statusBarTransparent() // Set transparent status bar for call screen
         setContentView(binding.root)
 
         handleIntentData()
@@ -44,7 +44,7 @@ class VoiceCall : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        callListener()
+        callListener() // Listener for incoming, outgoing, call accept, call reject.
     }
 
     private fun callListener() {
@@ -74,6 +74,7 @@ class VoiceCall : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        // Remove call listener when not in use.
         CometChat.removeCallListener(TAG)
     }
 
@@ -85,7 +86,7 @@ class VoiceCall : AppCompatActivity() {
     }
 
     private fun initiateVoiceCall() {
-
+        // Check Receiver type and create Call Object
         val call = if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) Call(
             receiverId,
             CometChatConstants.RECEIVER_TYPE_USER,

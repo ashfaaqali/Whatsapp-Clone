@@ -45,6 +45,7 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
 
         with(holder.binding) {
 
+            // Check if the conversation is with User or Group
             if (entity is User) {
                 conversationName.text = entity.name
                 Glide.with(holder.itemView)
@@ -57,6 +58,7 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
                     .into(profilePic)
             }
 
+            // Check message type
             if (message is TextMessage) {
                 lastMessage.text = message.text
             }
@@ -67,6 +69,7 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
                 lastMessageTime.text = formatTime(message.deliveredToMeAt)
             }
 
+            // Set unread messages count
             if (conversation.unreadMessageCount > 0) {
                 if (conversation.unreadMessageCount in 1..10) {
                     unreadMessageCount.visibility = View.VISIBLE
@@ -80,6 +83,7 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
             }
         }
 
+        // Click listener for conversations
         holder.itemView.setOnClickListener {
             if (entity is User) {
                 listener?.onChatItemClicked(entity.name, entity.uid, entity.avatar, conversation.lastMessage.receiverType)
