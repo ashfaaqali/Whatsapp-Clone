@@ -7,6 +7,28 @@
         <item name="colorAccent">#25D366</item> <!-- WhatsApp's green accent color -->
     </style>
 
+    <style name="Theme.BottomSheetDialog" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowEnterAnimation">@anim/bottom_sheet_enter</item>
+        <item name="android:windowExitAnimation">@anim/botttom_sheet_exit</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:layout_marginBottom">25dp</item>
+        <item name="android:layout_marginHorizontal" tools:targetApi="o">4dp</item>
+        <item name="bottomSheetStyle">@style/BottomSheet</item>
+    </style>
+
+    <style name="BottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/bottom_sheet_enter</item>
+        <item name="android:windowExitAnimation">@anim/botttom_sheet_exit</item>
+    </style>
+
+
+    <style name="BottomSheet" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bottom_sheet_shape_rounded</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
     <style name="circularImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>

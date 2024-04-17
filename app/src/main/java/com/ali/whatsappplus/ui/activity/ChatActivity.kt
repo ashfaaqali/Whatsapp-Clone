@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityChatBinding
 import com.ali.whatsappplus.ui.adapter.ChatAdapter
+import com.ali.whatsappplus.ui.bottomsheet.AttachmentsBottomSheet
+import com.ali.whatsappplus.ui.bottomsheet.LoginBottomSheetDialog
+import com.ali.whatsappplus.util.Constants
 import com.ali.whatsappplus.util.Constants.PICK_IMAGE_REQUEST
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
@@ -58,6 +61,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var layoutManager: LinearLayoutManager
     private var messagesRequest: MessagesRequest? = null
     private var latestReceivedMessageId = 0
+    private lateinit var bottomSheetDialog: AttachmentsBottomSheet
 
     private val mTextEditorWatcher: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -124,12 +128,17 @@ class ChatActivity : AppCompatActivity() {
         }
 
         binding.attachmentBtn.setOnClickListener {
-            openImagePicker()
+            showAttachmentsBottomSheet()
         }
 
         binding.voiceCall.setOnClickListener {
             navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType)
         }
+    }
+
+    private fun showAttachmentsBottomSheet() {
+        bottomSheetDialog = AttachmentsBottomSheet()
+        bottomSheetDialog.show(supportFragmentManager, Constants.ATTACHMENTS_BOTTOM_SHEET_TAG)
     }
 
     private fun openImagePicker() {
@@ -191,14 +200,6 @@ class ChatActivity : AppCompatActivity() {
 
         messagesRequest?.fetchPrevious(object : CallbackListener<List<BaseMessage>>() {
             override fun onSuccess(baseMessages: List<BaseMessage>) {
-
-//                for (message in baseMessages) {
-//                    if (message is TextMessage) {
-//                        Log.d(TAG, "Message history fetched successfully: $message")
-//                    } else if (message is MediaMessage) {
-//                        Log.d(TAG, "Media message history fetched successfully: $message")
-//                    }
-//                }
 
                 isInProgress = false
                 chatAdapter.updateList(baseMessages)

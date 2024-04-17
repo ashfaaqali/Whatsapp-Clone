@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showLoginBottomSheet() {
         bottomSheetDialog = LoginBottomSheetDialog()
-        bottomSheetDialog.show(supportFragmentManager, Constants.BOTTOM_SHEET_TAG)
+        bottomSheetDialog.show(supportFragmentManager, Constants.LOGIN_BOTTOM_SHEET_TAG)
     }
 
     private fun navigateToAllContacts() {
