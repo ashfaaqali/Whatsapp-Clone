@@ -121,7 +121,7 @@ class ChatActivity : AppCompatActivity() {
         binding.messageEditText.addTextChangedListener(mTextEditorWatcher)
 
         binding.voiceRecorderAndSendBtn.setOnClickListener {
-            val message = binding.messageEditText.text.toString()
+            val message = binding.messageEditText.text.toString().trim()
             if (message.isNotEmpty()) {
                 sendMessage(message)
                 binding.messageEditText.setText("")

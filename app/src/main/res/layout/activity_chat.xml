@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E0E1DC"
+    android:background="#D5D8C9"
     android:orientation="vertical"
     tools:context=".ui.activity.ChatActivity">
 
