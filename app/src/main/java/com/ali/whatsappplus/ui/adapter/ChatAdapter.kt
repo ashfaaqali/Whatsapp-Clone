@@ -3,6 +3,7 @@ package com.ali.whatsappplus.ui.adapter
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,10 @@ import com.cometchat.chat.models.BaseMessage
 import com.cometchat.chat.models.MediaMessage
 import com.cometchat.chat.models.TextMessage
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -67,196 +72,200 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
             if (sender == loggedInUser) Constants.RIGHT_CHAT_IMAGE_VIEW
             else Constants.LEFT_CHAT_IMAGE_VIEW
         } else -1
-}
+    }
 
-override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-    // Returning the appropriate view according to the ItemViewType
-    return when (viewType) {
-        Constants.LEFT_CHAT_TEXT_VIEW_LONG -> {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val textMessageItemBinding: LeftChatTextViewLongBinding =
-                LeftChatTextViewLongBinding.inflate(layoutInflater, parent, false)
-            textMessageItemBinding.root.tag = Constants.LEFT_CHAT_TEXT_VIEW_LONG
-            LeftChatTextViewLong(textMessageItemBinding)
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        // Returning the appropriate view according to the ItemViewType
+        return when (viewType) {
+            Constants.LEFT_CHAT_TEXT_VIEW_LONG -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val textMessageItemBinding: LeftChatTextViewLongBinding =
+                    LeftChatTextViewLongBinding.inflate(layoutInflater, parent, false)
+                textMessageItemBinding.root.tag = Constants.LEFT_CHAT_TEXT_VIEW_LONG
+                LeftChatTextViewLong(textMessageItemBinding)
+            }
 
-        Constants.LEFT_CHAT_TEXT_VIEW_SHORT -> {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val textMessageItemBinding: LeftChatTextViewShortBinding =
-                LeftChatTextViewShortBinding.inflate(layoutInflater, parent, false)
-            textMessageItemBinding.root.tag = Constants.LEFT_CHAT_TEXT_VIEW_SHORT
-            LeftChatTextViewShort(textMessageItemBinding)
-        }
+            Constants.LEFT_CHAT_TEXT_VIEW_SHORT -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val textMessageItemBinding: LeftChatTextViewShortBinding =
+                    LeftChatTextViewShortBinding.inflate(layoutInflater, parent, false)
+                textMessageItemBinding.root.tag = Constants.LEFT_CHAT_TEXT_VIEW_SHORT
+                LeftChatTextViewShort(textMessageItemBinding)
+            }
 
-        Constants.RIGHT_CHAT_TEXT_VIEW_LONG -> {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val textMessageItemBinding: RightChatTextViewLongBinding =
-                RightChatTextViewLongBinding.inflate(layoutInflater, parent, false)
-            textMessageItemBinding.root.tag = Constants.RIGHT_CHAT_TEXT_VIEW_LONG
-            RightChatTextViewLong(textMessageItemBinding)
-        }
+            Constants.RIGHT_CHAT_TEXT_VIEW_LONG -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val textMessageItemBinding: RightChatTextViewLongBinding =
+                    RightChatTextViewLongBinding.inflate(layoutInflater, parent, false)
+                textMessageItemBinding.root.tag = Constants.RIGHT_CHAT_TEXT_VIEW_LONG
+                RightChatTextViewLong(textMessageItemBinding)
+            }
 
-        Constants.RIGHT_CHAT_TEXT_VIEW_SHORT -> {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val textMessageItemBinding: RightChatTextViewShortBinding =
-                RightChatTextViewShortBinding.inflate(layoutInflater, parent, false)
-            textMessageItemBinding.root.tag = Constants.RIGHT_CHAT_TEXT_VIEW_SHORT
-            RightChatTextViewShort(textMessageItemBinding)
-        }
+            Constants.RIGHT_CHAT_TEXT_VIEW_SHORT -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val textMessageItemBinding: RightChatTextViewShortBinding =
+                    RightChatTextViewShortBinding.inflate(layoutInflater, parent, false)
+                textMessageItemBinding.root.tag = Constants.RIGHT_CHAT_TEXT_VIEW_SHORT
+                RightChatTextViewShort(textMessageItemBinding)
+            }
 
-        Constants.RIGHT_CHAT_IMAGE_VIEW -> {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val imageMessageItemBinding: RightChatImageViewBinding =
-                RightChatImageViewBinding.inflate(layoutInflater, parent, false)
-            imageMessageItemBinding.root.tag = Constants.RIGHT_CHAT_IMAGE_VIEW
-            RightChatImageView(imageMessageItemBinding)
-        }
+            Constants.RIGHT_CHAT_IMAGE_VIEW -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val imageMessageItemBinding: RightChatImageViewBinding =
+                    RightChatImageViewBinding.inflate(layoutInflater, parent, false)
+                imageMessageItemBinding.root.tag = Constants.RIGHT_CHAT_IMAGE_VIEW
+                RightChatImageView(imageMessageItemBinding)
+            }
 
-        Constants.LEFT_CHAT_IMAGE_VIEW -> {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val imageMessageItemBinding: LeftChatImageViewBinding =
-                LeftChatImageViewBinding.inflate(layoutInflater, parent, false)
-            imageMessageItemBinding.root.tag = Constants.LEFT_CHAT_IMAGE_VIEW
-            LeftChatImageView(imageMessageItemBinding)
-        }
+            Constants.LEFT_CHAT_IMAGE_VIEW -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val imageMessageItemBinding: LeftChatImageViewBinding =
+                    LeftChatImageViewBinding.inflate(layoutInflater, parent, false)
+                imageMessageItemBinding.root.tag = Constants.LEFT_CHAT_IMAGE_VIEW
+                LeftChatImageView(imageMessageItemBinding)
+            }
 
-        else -> {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val imageMessageItemBinding: LeftChatImageViewBinding =
-                LeftChatImageViewBinding.inflate(layoutInflater, parent, false)
-            imageMessageItemBinding.root.tag = Constants.LEFT_CHAT_IMAGE_VIEW
-            LeftChatImageView(imageMessageItemBinding)
+            else -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val imageMessageItemBinding: LeftChatImageViewBinding =
+                    LeftChatImageViewBinding.inflate(layoutInflater, parent, false)
+                imageMessageItemBinding.root.tag = Constants.LEFT_CHAT_IMAGE_VIEW
+                LeftChatImageView(imageMessageItemBinding)
+            }
         }
     }
-}
 
-override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-    val baseMessage = messageList[position]
+    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        val baseMessage = messageList[position]
 
-    // Setting the data to the views according to the view type
-    when (viewHolder.itemViewType) {
-        Constants.LEFT_CHAT_TEXT_VIEW_LONG -> setTextData(
-            viewHolder as LeftChatTextViewLong,
-            position
-        )
+        // Setting the data to the views according to the view type
+        when (viewHolder.itemViewType) {
+            Constants.LEFT_CHAT_TEXT_VIEW_LONG -> setTextData(
+                viewHolder as LeftChatTextViewLong,
+                position
+            )
 
-        Constants.LEFT_CHAT_TEXT_VIEW_SHORT -> setTextData(
-            viewHolder as LeftChatTextViewShort,
-            position
-        )
+            Constants.LEFT_CHAT_TEXT_VIEW_SHORT -> setTextData(
+                viewHolder as LeftChatTextViewShort,
+                position
+            )
 
-        Constants.RIGHT_CHAT_TEXT_VIEW_LONG -> setTextData(
-            viewHolder as RightChatTextViewLong,
-            position
-        )
+            Constants.RIGHT_CHAT_TEXT_VIEW_LONG -> setTextData(
+                viewHolder as RightChatTextViewLong,
+                position
+            )
 
-        Constants.RIGHT_CHAT_TEXT_VIEW_SHORT -> setTextData(
-            viewHolder as RightChatTextViewShort,
-            position
-        )
+            Constants.RIGHT_CHAT_TEXT_VIEW_SHORT -> setTextData(
+                viewHolder as RightChatTextViewShort,
+                position
+            )
 
-        Constants.LEFT_CHAT_IMAGE_VIEW -> setImageData(
-            viewHolder as LeftChatImageView,
-            position
-        )
+            Constants.LEFT_CHAT_IMAGE_VIEW -> setImageData(
+                viewHolder as LeftChatImageView,
+                position
+            )
 
-        Constants.RIGHT_CHAT_IMAGE_VIEW -> setImageData(
-            viewHolder as RightChatImageView,
-            position
-        )
+            Constants.RIGHT_CHAT_IMAGE_VIEW -> setImageData(
+                viewHolder as RightChatImageView,
+                position
+            )
+        }
+        // Setting the message status icon (sent/delivered/read)
+        // setStatusIcon(baseMessage, viewHolder)
     }
-    // Setting the message status icon (sent/delivered/read)
-    // setStatusIcon(baseMessage, viewHolder)
-}
 
-private fun setImageData(viewHolder: RecyclerView.ViewHolder, position: Int) {
-    val baseMessage = messageList[position]
-    val mediaMessage = (baseMessage as MediaMessage)
-    Log.i(TAG, "File URL: ${mediaMessage.attachment.fileUrl}")
-    if (viewHolder is LeftChatImageView) {
-        Glide.with(context)
-            .load(mediaMessage.attachment.fileUrl)
-            .into(viewHolder.binding.leftImageMessage)
-    } else {
-        viewHolder as RightChatImageView
-        Glide.with(context)
-            .load(mediaMessage.attachment.fileUrl)
-            .into(viewHolder.binding.rightImageMessage)
-    }
-}
-
-private fun setTextData(viewHolder: RecyclerView.ViewHolder, position: Int) {
-    val baseMessage = messageList[position]
-    val textMessage = (baseMessage as TextMessage)
-
-    if (viewHolder is LeftChatTextViewLong) {
-        viewHolder.binding.leftMessageTextView.text = textMessage.text
-    } else if (viewHolder is LeftChatTextViewShort) {
-        viewHolder.binding.leftMessageTextView.text = textMessage.text
-    } else if (viewHolder is RightChatTextViewLong) {
-        viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
-    } else {
-        viewHolder as RightChatTextViewShort
-        viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
-    }
-}
-
-fun updateList(baseMessageList: List<BaseMessage>) {
-    setMessageList(baseMessageList)
-}
-
-// Get message timestamp
-private fun getTimestamp(milliSeconds: Long): String {
-    val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
-    val date = Date(milliSeconds)
-    return sdf.format(date)
-}
-
-override fun getItemCount(): Int {
-    return messageList.size
-}
-
-fun addMessage(baseMessage: BaseMessage) {
-    messageList.add(baseMessage)
-    notifyItemInserted(messageList.size - 1)
-}
-
-private fun setStatusIcon(baseMessage: BaseMessage) {
-    with(binding) {
-
-        if (baseMessage.readAt > 0) {
-            messageStatusIcon.setImageResource(ic_delivered)
-            val blueColor = ContextCompat.getColorStateList(context, color.blue)
-            messageStatusIcon.imageTintList = blueColor
-        } else if (baseMessage.deliveredAt > 0) {
-            messageStatusIcon.setImageResource(ic_delivered)
-            val deliveredColor =
-                ContextCompat.getColorStateList(context, color.grey)
-            messageStatusIcon.imageTintList = deliveredColor
+    private fun setImageData(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        val baseMessage = messageList[position]
+        val mediaMessage = (baseMessage as MediaMessage)
+        Log.i(TAG, "File URL: ${mediaMessage.attachment.fileUrl}")
+        if (viewHolder is LeftChatImageView) {
+            Glide.with(context)
+                .load(mediaMessage.attachment.fileUrl)
+                .into(viewHolder.binding.leftImageMessage)
         } else {
-            messageStatusIcon.setImageResource(ic_sent)
-            val greyColor =
-                ContextCompat.getColorStateList(context, color.grey)
-            messageStatusIcon.imageTintList = greyColor
+            viewHolder as RightChatImageView
+            Glide.with(context)
+                .load(mediaMessage.attachment.fileUrl)
+                .into(viewHolder.binding.rightImageMessage)
         }
     }
-}
 
-inner class LeftChatTextViewLong(val binding: LeftChatTextViewLongBinding) :
-    RecyclerView.ViewHolder(binding.root)
+    private fun setTextData(viewHolder: RecyclerView.ViewHolder, position: Int) {
+        val baseMessage = messageList[position]
+        val textMessage = (baseMessage as TextMessage)
 
-inner class LeftChatTextViewShort(val binding: LeftChatTextViewShortBinding) :
-    RecyclerView.ViewHolder(binding.root)
+        if (viewHolder is LeftChatTextViewLong) {
+            viewHolder.binding.leftMessageTextView.text = textMessage.text
+            viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+        } else if (viewHolder is LeftChatTextViewShort) {
+            viewHolder.binding.leftMessageTextView.text = textMessage.text
+            viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+        } else if (viewHolder is RightChatTextViewLong) {
+            viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
+            viewHolder.binding.rightChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+        } else {
+            viewHolder as RightChatTextViewShort
+            viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
+            viewHolder.binding.rightChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+        }
+    }
 
-inner class RightChatTextViewLong(val binding: RightChatTextViewLongBinding) :
-    RecyclerView.ViewHolder(binding.root)
+    fun updateList(baseMessageList: List<BaseMessage>) {
+        setMessageList(baseMessageList)
+    }
 
-inner class RightChatTextViewShort(val binding: RightChatTextViewShortBinding) :
-    RecyclerView.ViewHolder(binding.root)
+    // Get message timestamp
+    private fun getTimestamp(timestamp: Long): String {
+        val milliseconds = timestamp * 1000
+        val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
+        return sdf.format(Date(milliseconds))
+    }
 
-inner class LeftChatImageView(val binding: LeftChatImageViewBinding) :
-    RecyclerView.ViewHolder(binding.root)
+    override fun getItemCount(): Int {
+        return messageList.size
+    }
 
-inner class RightChatImageView(val binding: RightChatImageViewBinding) :
-    RecyclerView.ViewHolder(binding.root)
+    fun addMessage(baseMessage: BaseMessage) {
+        messageList.add(baseMessage)
+        notifyItemInserted(messageList.size - 1)
+    }
+
+    private fun setStatusIcon(baseMessage: BaseMessage) {
+        with(binding) {
+
+            if (baseMessage.readAt > 0) {
+                messageStatusIcon.setImageResource(ic_delivered)
+                val blueColor = ContextCompat.getColorStateList(context, color.blue)
+                messageStatusIcon.imageTintList = blueColor
+            } else if (baseMessage.deliveredAt > 0) {
+                messageStatusIcon.setImageResource(ic_delivered)
+                val deliveredColor =
+                    ContextCompat.getColorStateList(context, color.grey)
+                messageStatusIcon.imageTintList = deliveredColor
+            } else {
+                messageStatusIcon.setImageResource(ic_sent)
+                val greyColor =
+                    ContextCompat.getColorStateList(context, color.grey)
+                messageStatusIcon.imageTintList = greyColor
+            }
+        }
+    }
+
+    inner class LeftChatTextViewLong(val binding: LeftChatTextViewLongBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    inner class LeftChatTextViewShort(val binding: LeftChatTextViewShortBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    inner class RightChatTextViewLong(val binding: RightChatTextViewLongBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    inner class RightChatTextViewShort(val binding: RightChatTextViewShortBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    inner class LeftChatImageView(val binding: LeftChatImageViewBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    inner class RightChatImageView(val binding: RightChatImageViewBinding) :
+        RecyclerView.ViewHolder(binding.root)
 }

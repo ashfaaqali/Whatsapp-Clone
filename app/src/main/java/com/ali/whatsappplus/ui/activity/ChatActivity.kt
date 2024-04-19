@@ -240,12 +240,11 @@ class ChatActivity : AppCompatActivity() {
         val receiverType =
             if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) CometChatConstants.RECEIVER_TYPE_USER else CometChatConstants.RECEIVER_TYPE_GROUP
         val textMessage = TextMessage(receiverId, message, receiverType)
-        chatAdapter.addMessage(textMessage)
         textMessage.sender = CometChat.getLoggedInUser()
-        textMessage.sentAt = System.currentTimeMillis()
-        binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
         CometChat.sendMessage(textMessage, object : CallbackListener<TextMessage>() {
             override fun onSuccess(message: TextMessage) {
+                chatAdapter.addMessage(message)
+                binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
                 Log.i(TAG, "Message Sent Success: $message")
             }
 
