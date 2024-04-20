@@ -1,9 +1,9 @@
 package com.ali.whatsappplus.ui.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -24,10 +24,6 @@ import com.cometchat.chat.models.BaseMessage
 import com.cometchat.chat.models.MediaMessage
 import com.cometchat.chat.models.TextMessage
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -145,10 +141,12 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
                 position
             )
 
-            Constants.LEFT_CHAT_TEXT_VIEW_SHORT -> setTextData(
-                viewHolder as LeftChatTextViewShort,
-                position
-            )
+            Constants.LEFT_CHAT_TEXT_VIEW_SHORT -> {
+                setTextData(
+                    viewHolder as LeftChatTextViewShort,
+                    position
+                )
+            }
 
             Constants.RIGHT_CHAT_TEXT_VIEW_LONG -> setTextData(
                 viewHolder as RightChatTextViewLong,
@@ -170,10 +168,9 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
                 position
             )
         }
-        // Setting the message status icon (sent/delivered/read)
-        // setStatusIcon(baseMessage, viewHolder)
     }
 
+    // Set Image Message And Timestamp
     private fun setImageData(viewHolder: RecyclerView.ViewHolder, position: Int) {
         val baseMessage = messageList[position]
         val mediaMessage = (baseMessage as MediaMessage)
@@ -190,6 +187,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         }
     }
 
+    // Set Text Message And Timestamp
     private fun setTextData(viewHolder: RecyclerView.ViewHolder, position: Int) {
         val baseMessage = messageList[position]
         val textMessage = (baseMessage as TextMessage)
@@ -203,13 +201,16 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         } else if (viewHolder is RightChatTextViewLong) {
             viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
             viewHolder.binding.rightChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+            setMessageStatusIcon(viewHolder, baseMessage)
         } else {
             viewHolder as RightChatTextViewShort
             viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
             viewHolder.binding.rightChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+            setMessageStatusIcon(viewHolder, baseMessage)
         }
     }
 
+    // Update the list on fetchPrevious
     fun updateList(baseMessageList: List<BaseMessage>) {
         setMessageList(baseMessageList)
     }
@@ -225,31 +226,55 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         return messageList.size
     }
 
+    // Method to add the message that is received in real-time
     fun addMessage(baseMessage: BaseMessage) {
-        messageList.add(baseMessage)
+        this.messageList.add(baseMessage)
         notifyItemInserted(messageList.size - 1)
     }
 
-    private fun setStatusIcon(baseMessage: BaseMessage) {
-        with(binding) {
-
-            if (baseMessage.readAt > 0) {
-                messageStatusIcon.setImageResource(ic_delivered)
-                val blueColor = ContextCompat.getColorStateList(context, color.blue)
-                messageStatusIcon.imageTintList = blueColor
-            } else if (baseMessage.deliveredAt > 0) {
-                messageStatusIcon.setImageResource(ic_delivered)
-                val deliveredColor =
-                    ContextCompat.getColorStateList(context, color.grey)
-                messageStatusIcon.imageTintList = deliveredColor
+    // Set Read/Delivered/Sent Icon
+    private fun setMessageStatusIcon(
+        viewHolder: RecyclerView.ViewHolder,
+        baseMessage: BaseMessage
+    ) {
+        if (viewHolder is RightChatTextViewLong) {
+            if (baseMessage.readAt != 0L) {
+                viewHolder.binding.messageStatusIcon.setImageResource(ic_delivered)
+                viewHolder.binding.messageStatusIcon.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, color.blue)
+                )
+            } else if (baseMessage.deliveredAt != 0L) {
+                viewHolder.binding.messageStatusIcon.setImageResource(ic_delivered)
+                viewHolder.binding.messageStatusIcon.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, color.grey)
+                )
             } else {
-                messageStatusIcon.setImageResource(ic_sent)
-                val greyColor =
-                    ContextCompat.getColorStateList(context, color.grey)
-                messageStatusIcon.imageTintList = greyColor
+                viewHolder.binding.messageStatusIcon.setImageResource(ic_sent)
+                viewHolder.binding.messageStatusIcon.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, color.grey)
+                )
+            }
+        } else {
+            viewHolder as RightChatTextViewShort
+            if (baseMessage.readAt != 0L) {
+                viewHolder.binding.messageStatusIcon.setImageResource(ic_delivered)
+                viewHolder.binding.messageStatusIcon.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, color.blue)
+                )
+            } else if (baseMessage.deliveredAt != 0L) {
+                viewHolder.binding.messageStatusIcon.setImageResource(ic_delivered)
+                viewHolder.binding.messageStatusIcon.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, color.grey)
+                )
+            } else {
+                viewHolder.binding.messageStatusIcon.setImageResource(ic_sent)
+                viewHolder.binding.messageStatusIcon.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(context, color.grey)
+                )
             }
         }
     }
+
 
     inner class LeftChatTextViewLong(val binding: LeftChatTextViewLongBinding) :
         RecyclerView.ViewHolder(binding.root)

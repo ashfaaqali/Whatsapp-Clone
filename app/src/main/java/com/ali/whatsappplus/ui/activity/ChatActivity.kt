@@ -17,9 +17,7 @@ import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityChatBinding
 import com.ali.whatsappplus.ui.adapter.ChatAdapter
 import com.ali.whatsappplus.ui.bottomsheet.AttachmentsBottomSheet
-import com.ali.whatsappplus.ui.bottomsheet.LoginBottomSheetDialog
 import com.ali.whatsappplus.util.Constants
-import com.ali.whatsappplus.util.Constants.PICK_IMAGE_REQUEST
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat
@@ -37,7 +35,6 @@ import com.cometchat.chat.models.MediaMessage
 import com.cometchat.chat.models.MessageReceipt
 import com.cometchat.chat.models.TextMessage
 import com.cometchat.chat.models.TypingIndicator
-import okhttp3.internal.notifyAll
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -204,7 +201,10 @@ class ChatActivity : AppCompatActivity() {
 
         messagesRequest?.fetchPrevious(object : CallbackListener<List<BaseMessage>>() {
             override fun onSuccess(baseMessages: List<BaseMessage>) {
-
+                if (baseMessages.isNotEmpty()) {
+                    val baseMessage = baseMessages[baseMessages.size - 1]
+                    markAsRead(baseMessage)
+                }
                 isInProgress = false
                 chatAdapter.updateList(baseMessages)
 
@@ -212,11 +212,6 @@ class ChatActivity : AppCompatActivity() {
                 val itemsAdded = baseMessages.size
                 if (itemsAdded > 0) {
                     binding.chatMessagesRecyclerView.scrollToPosition(itemsAdded)
-                }
-
-                if (baseMessages.isNotEmpty()) {
-                    val baseMessage = baseMessages[baseMessages.size - 1]
-                    markAsRead(baseMessage)
                 }
 
                 if (baseMessages.isEmpty()) {
@@ -243,8 +238,7 @@ class ChatActivity : AppCompatActivity() {
         textMessage.sender = CometChat.getLoggedInUser()
         CometChat.sendMessage(textMessage, object : CallbackListener<TextMessage>() {
             override fun onSuccess(message: TextMessage) {
-                chatAdapter.addMessage(message)
-                binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                addMessageToChat(message)
                 Log.i(TAG, "Message Sent Success: $message")
             }
 
@@ -252,6 +246,11 @@ class ChatActivity : AppCompatActivity() {
                 Log.i(TAG, "Message Sent Failed: $p0 [$receiverType] [$receiverId]")
             }
         })
+    }
+
+    private fun addMessageToChat(message: BaseMessage) {
+        chatAdapter.addMessage(message)
+        binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
     }
 
     private fun sendMediaMessage(file: File) {
@@ -267,12 +266,12 @@ class ChatActivity : AppCompatActivity() {
                 CometChatConstants.MESSAGE_TYPE_IMAGE,
                 CometChatConstants.RECEIVER_TYPE_GROUP
             )
+
         mediaMessage.sender = CometChat.getLoggedInUser()
         sendMediaMessage(mediaMessage, object : CallbackListener<MediaMessage>() {
-            override fun onSuccess(p0: MediaMessage) {
-                chatAdapter.addMessage(p0)
-                scrollToBottom()
-                Log.i(TAG, "sendMediaMessage OnSuccess: $p0")
+            override fun onSuccess(message: MediaMessage) {
+                addMessageToChat(message)
+                Log.i(TAG, "sendMediaMessage OnSuccess: $message")
             }
 
             override fun onError(p0: CometChatException?) {
@@ -286,9 +285,8 @@ class ChatActivity : AppCompatActivity() {
         CometChat.addMessageListener(TAG, object : CometChat.MessageListener() {
             override fun onTextMessageReceived(textMessage: TextMessage?) {
                 if (textMessage != null) {
-                    textMessage.deliveredAt = System.currentTimeMillis()
-                    textMessage.readAt = System.currentTimeMillis()
-                    markAsDelivered(textMessage)
+                    if (isUserOrGroup()) markAsDelivered(textMessage.id, textMessage.receiverUid, CometChatConstants.RECEIVER_TYPE_USER, textMessage.sender.uid)
+                    else markAsDelivered(textMessage.id, textMessage.receiverUid, CometChatConstants.RECEIVER_TYPE_GROUP, textMessage.sender.uid)
                     markAsRead(textMessage)
                     chatAdapter.addMessage(textMessage)
                     Log.i(TAG, "onTextMessageReceived: $textMessage")
@@ -299,8 +297,6 @@ class ChatActivity : AppCompatActivity() {
             override fun onMediaMessageReceived(mediaMessage: MediaMessage?) {
                 Log.i(TAG, "onMediaMessageReceived: ${mediaMessage?.file}")
                 if (mediaMessage != null) {
-                    mediaMessage.deliveredAt = System.currentTimeMillis()
-                    mediaMessage.readAt = System.currentTimeMillis()
                     markAsDelivered(mediaMessage)
                     markAsRead(mediaMessage)
                     chatAdapter.addMessage(mediaMessage)
@@ -327,22 +323,14 @@ class ChatActivity : AppCompatActivity() {
             }
 
             override fun onMessagesRead(messageReadReceipt: MessageReceipt?) {
-
+                Log.d(TAG, "onMessageDelivered: $messageReadReceipt")
             }
 
         })
     }
 
-    private fun markMessageAsRead(message: BaseMessage) {
-        markAsRead(message, object : CallbackListener<Void?>() {
-            override fun onSuccess(unused: Void?) {
-                Log.e(TAG, "markAsRead : " + "success")
-            }
-
-            override fun onError(e: CometChatException) {
-                Log.e(TAG, "markAsRead : " + e.message)
-            }
-        })
+    private fun isUserOrGroup(): Boolean {
+        return receiverType == "user"
     }
 
     private fun fetchMissedMessages() {
