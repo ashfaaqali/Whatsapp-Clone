@@ -34,6 +34,8 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
     private lateinit var message: BaseMessage
     private val TAG = "ChatAdapter"
 
+    var messageLongPressListener: OnMessageLongPress? = null
+
     init {
         setMessageList(baseMessages)
     }
@@ -168,6 +170,15 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
                 position
             )
         }
+
+        viewHolder.itemView.setOnLongClickListener {
+            // messageLongPressListener?.onMessageItemLongPress()
+            selectMessage()
+        }
+    }
+
+    private fun selectMessage() {
+
     }
 
     // Set Image Message And Timestamp
@@ -293,4 +304,8 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
     inner class RightChatImageView(val binding: RightChatImageViewBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    interface OnMessageLongPress {
+        fun onMessageItemLongPress()
+    }
 }

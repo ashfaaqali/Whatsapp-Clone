@@ -107,6 +107,12 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
         chatAdapter = ChatAdapter(this, messageList)
+        chatAdapter.messageLongPressListener = object : ChatAdapter.OnMessageLongPress {
+            override fun onMessageItemLongPress() {
+
+            }
+
+        }
 
         handleIntentData()
         setUserData()
