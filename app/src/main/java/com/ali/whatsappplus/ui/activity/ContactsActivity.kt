@@ -76,6 +76,7 @@ class ContactsActivity : AppCompatActivity() {
         intent.putExtra("name", user.name)
         intent.putExtra("avatar", user.avatar)
         intent.putExtra("receiverId", user.uid)
+        intent.putExtra("receiverType", "user")
         startActivity(intent)
     }
 }
