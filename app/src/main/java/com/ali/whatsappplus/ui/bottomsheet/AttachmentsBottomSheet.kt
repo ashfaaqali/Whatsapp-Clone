@@ -9,6 +9,7 @@ import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.AttachmentsBottomSheetBinding
 import com.ali.whatsappplus.databinding.ChatItemBinding
 import com.ali.whatsappplus.databinding.SampleLoginBottomSheetBinding
+import com.ali.whatsappplus.ui.activity.ChatActivity
 import com.ali.whatsappplus.ui.activity.MainActivity
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -40,7 +41,7 @@ class AttachmentsBottomSheet : BottomSheetDialogFragment() {
         }
 
         binding.gallery.setOnClickListener{
-            (activity as? MainActivity)?.logoutAndLogin("superhero3")
+            (activity as? ChatActivity)?.openImagePicker()
             dismiss()
         }
 
