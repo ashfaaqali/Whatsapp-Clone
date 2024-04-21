@@ -5,13 +5,16 @@
     android:layout_height="wrap_content">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/message_constraint_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:background="@drawable/message_bg"
         android:backgroundTint="@color/right_message_color"
-        android:layout_margin="4dp"
+        android:paddingHorizontal="6dp"
         android:paddingVertical="2dp"
-        android:paddingHorizontal="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
@@ -38,22 +41,34 @@
             android:id="@+id/right_chat_timestamp_txt_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/message_status_icon"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintHorizontal_bias="1"
-            android:layout_marginEnd="4dp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/right_chat_message_txt_view" />
 
         <ImageView
             android:id="@+id/message_status_icon"
             android:layout_width="11dp"
             android:layout_height="11dp"
-            android:src="@drawable/ic_sent"
             android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/right_chat_message_txt_view" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/message_selection_view"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#753595AD"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
