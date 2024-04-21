@@ -4,9 +4,13 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.LayoutParams
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.ali.whatsappplus.R
 import com.ali.whatsappplus.R.color
 import com.ali.whatsappplus.R.drawable.ic_delivered
 import com.ali.whatsappplus.R.drawable.ic_sent
@@ -28,8 +32,15 @@ import java.util.Date
 import java.util.Locale
 
 class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    RecyclerView.Adapter<ViewHolder>() {
     private var messageList: MutableList<BaseMessage> = ArrayList()
+    private var selectedMessageId = 0
+    private var longClickedMessageId: Int? = null
+    // Boolean flag to track if a message is selected or not
+    private var isMessageSelected: Boolean = false
+
+    // List to store indices of selected messages
+    private val selectedMessageIndices: MutableList<Int> = mutableListOf()
     private lateinit var binding: ChatItemBinding
     private lateinit var message: BaseMessage
     private val TAG = "ChatAdapter"
@@ -72,7 +83,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         } else -1
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // Returning the appropriate view according to the ItemViewType
         return when (viewType) {
             Constants.LEFT_CHAT_TEXT_VIEW_LONG -> {
@@ -133,8 +144,12 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         }
     }
 
-    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val baseMessage = messageList[position]
+        val messageId = baseMessage.id
+
+        // Set selected state based on whether the message is in selectedMessageIndices
+//        viewHolder.itemView.isSelected = selectedMessageIndices.contains(position)
 
         // Setting the data to the views according to the view type
         when (viewHolder.itemViewType) {
@@ -150,10 +165,12 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
                 )
             }
 
-            Constants.RIGHT_CHAT_TEXT_VIEW_LONG -> setTextData(
-                viewHolder as RightChatTextViewLong,
-                position
-            )
+            Constants.RIGHT_CHAT_TEXT_VIEW_LONG -> {
+                setTextData(
+                    viewHolder as RightChatTextViewLong,
+                    position
+                )
+            }
 
             Constants.RIGHT_CHAT_TEXT_VIEW_SHORT -> setTextData(
                 viewHolder as RightChatTextViewShort,
@@ -171,18 +188,58 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
             )
         }
 
+        // Set selected state based on whether the message is the currently long-clicked message
+        val isLongClicked = messageId == longClickedMessageId
+        viewHolder.itemView.isSelected = isLongClicked
+
+        // Long click listener to toggle message selection
         viewHolder.itemView.setOnLongClickListener {
-            // messageLongPressListener?.onMessageItemLongPress()
-            selectMessage()
+            longClickedMessageId = messageId // Update the long-clicked message ID
+            notifyDataSetChanged() // Refresh view to update selection state
+            true // Consume the long click event
+        }
+
+        // Show or hide messageSelectionView based on whether the message is long-clicked
+        val messageSelectionView = viewHolder.itemView.findViewById<View>(R.id.message_selection_view)
+        if (messageSelectionView != null) {
+            messageSelectionView.visibility = if (isLongClicked) View.VISIBLE else View.GONE
         }
     }
 
-    private fun selectMessage() {
+    private fun toggleMessageSelection(baseMessage: BaseMessage, viewHolder: ViewHolder) {
+        val messageId = baseMessage.id
+        selectedMessageId = if (selectedMessageId == messageId) {
+            0 // Deselect the message
+        } else {
+            messageId // Select the message
+        }
 
+        // Toggle overall selection state
+        isMessageSelected = selectedMessageId != 0
+        notifyDataSetChanged() // Refresh view to update selection state
+    }
+
+    private fun selectMessage(isSelected: Boolean, baseMessage: BaseMessage, viewHolder: ViewHolder) {
+
+        // Show or hide messageSelectionView based on selection state
+//        val messageSelectionView = viewHolder.itemView.findViewById<View>(R.id.message_selection_view)
+
+        if (viewHolder is RightChatTextViewLong) {
+            val messageSelectionView = viewHolder.binding.messageSelectionView
+            val messageConstraintLayout = viewHolder.binding.messageConstraintLayout
+
+            // Set the width and height of the message_selection_view
+            val layoutParams = messageSelectionView.layoutParams
+            layoutParams.width = LayoutParams.MATCH_PARENT
+            layoutParams.height = messageConstraintLayout.height
+            messageSelectionView.layoutParams = layoutParams
+
+            messageSelectionView.visibility = if (isSelected) View.VISIBLE else View.GONE
+        }
     }
 
     // Set Image Message And Timestamp
-    private fun setImageData(viewHolder: RecyclerView.ViewHolder, position: Int) {
+    private fun setImageData(viewHolder: ViewHolder, position: Int) {
         val baseMessage = messageList[position]
         val mediaMessage = (baseMessage as MediaMessage)
         Log.i(TAG, "File URL: ${mediaMessage.attachment.fileUrl}")
@@ -199,7 +256,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
     }
 
     // Set Text Message And Timestamp
-    private fun setTextData(viewHolder: RecyclerView.ViewHolder, position: Int) {
+    private fun setTextData(viewHolder: ViewHolder, position: Int) {
         val baseMessage = messageList[position]
         val textMessage = (baseMessage as TextMessage)
 
@@ -245,7 +302,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
     // Set Read/Delivered/Sent Icon
     private fun setMessageStatusIcon(
-        viewHolder: RecyclerView.ViewHolder,
+        viewHolder: ViewHolder,
         baseMessage: BaseMessage
     ) {
         if (viewHolder is RightChatTextViewLong) {
@@ -288,22 +345,24 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
 
     inner class LeftChatTextViewLong(val binding: LeftChatTextViewLongBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        ViewHolder(binding.root)
 
     inner class LeftChatTextViewShort(val binding: LeftChatTextViewShortBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        ViewHolder(binding.root)
 
     inner class RightChatTextViewLong(val binding: RightChatTextViewLongBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        ViewHolder(binding.root)
 
     inner class RightChatTextViewShort(val binding: RightChatTextViewShortBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        ViewHolder(binding.root)
 
     inner class LeftChatImageView(val binding: LeftChatImageViewBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        ViewHolder(binding.root)
 
     inner class RightChatImageView(val binding: RightChatImageViewBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        ViewHolder(binding.root)
+//    inner class SelectedMessageView(val binding: ) :
+//        ViewHolder(binding.root)
 
     interface OnMessageLongPress {
         fun onMessageItemLongPress()

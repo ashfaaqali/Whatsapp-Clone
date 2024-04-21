@@ -147,7 +147,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
     // Image Picker Intent
-    private fun openImagePicker() {
+    fun openImagePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"))
