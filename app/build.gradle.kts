@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -48,6 +49,9 @@ dependencies {
     implementation ("com.cometchat:chat-sdk-android:4.0.5")
     implementation ("com.cometchat:calls-sdk-android:4.0.2")
 
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-messaging")
 
     //Glide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
