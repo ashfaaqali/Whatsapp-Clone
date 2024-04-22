@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primary_color">#075E54</color>
 
     <color name="right_message_color">#D1FFD4</color>
     <color name="left_message_color">#F3F0F0</color>
