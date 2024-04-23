@@ -283,6 +283,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         notifyItemInserted(messageList.size - 1)
     }
 
+
     // Set Read/Delivered/Sent Icon
     private fun setMessageStatusIcon(
         viewHolder: ViewHolder,
