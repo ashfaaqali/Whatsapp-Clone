@@ -60,15 +60,12 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/message_selection_view"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="0dp"
+        app:layout_constraintHeight_percent="1"
         android:background="#753595AD"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
