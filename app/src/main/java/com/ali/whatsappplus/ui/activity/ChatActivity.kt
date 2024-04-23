@@ -1,6 +1,5 @@
 package com.ali.whatsappplus.ui.activity
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,6 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -91,14 +91,11 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private val imagePickerLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-                val selectedImageUri = result.data?.data
-                if (selectedImageUri != null) {
-                    val file = createFileFromUri(selectedImageUri)
-                    Log.i(TAG, file.toString())
-                    if (file != null) sendMediaMessage(file)
-                }
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                val file = createFileFromUri(uri)
+                Log.i(TAG, file.toString())
+                if (file != null) sendMediaMessage(file)
             }
         }
 
@@ -107,13 +104,6 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
         chatAdapter = ChatAdapter(this, messageList)
-        chatAdapter.messageLongPressListener = object : ChatAdapter.OnMessageLongPress {
-            override fun onMessageItemLongPress() {
-
-            }
-
-        }
-
         handleIntentData()
         setUserData()
         setupRecyclerView()
@@ -148,9 +138,9 @@ class ChatActivity : AppCompatActivity() {
 
     // Image Picker Intent
     fun openImagePicker() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
-        imagePickerLauncher.launch(Intent.createChooser(intent, "Select Picture"))
+//        val intent = Intent(Intent.ACTION_GET_CONTENT)
+//        intent.type = "image/*"
+        imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
     }
 
     // Create File object from URI
@@ -187,7 +177,6 @@ class ChatActivity : AppCompatActivity() {
             storageDir /* directory */
         )
     }
-
 
     private fun fetchMessage() {
 
@@ -291,8 +280,18 @@ class ChatActivity : AppCompatActivity() {
         CometChat.addMessageListener(TAG, object : CometChat.MessageListener() {
             override fun onTextMessageReceived(textMessage: TextMessage?) {
                 if (textMessage != null) {
-                    if (isUserOrGroup()) markAsDelivered(textMessage.id, textMessage.receiverUid, CometChatConstants.RECEIVER_TYPE_USER, textMessage.sender.uid)
-                    else markAsDelivered(textMessage.id, textMessage.receiverUid, CometChatConstants.RECEIVER_TYPE_GROUP, textMessage.sender.uid)
+                    if (isUser()) markAsDelivered(
+                        textMessage.id,
+                        textMessage.receiverUid,
+                        CometChatConstants.RECEIVER_TYPE_USER,
+                        textMessage.sender.uid
+                    )
+                    else markAsDelivered(
+                        textMessage.id,
+                        textMessage.receiverUid,
+                        CometChatConstants.RECEIVER_TYPE_GROUP,
+                        textMessage.sender.uid
+                    )
                     markAsRead(textMessage)
                     chatAdapter.addMessage(textMessage)
                     Log.i(TAG, "onTextMessageReceived: $textMessage")
@@ -335,7 +334,7 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
-    private fun isUserOrGroup(): Boolean {
+    private fun isUser(): Boolean {
         return receiverType == "user"
     }
 
