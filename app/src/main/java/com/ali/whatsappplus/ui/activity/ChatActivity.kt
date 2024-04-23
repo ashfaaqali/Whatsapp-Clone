@@ -7,6 +7,7 @@ import android.os.Environment
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -114,6 +115,10 @@ class ChatActivity : AppCompatActivity() {
 
         binding.messageEditText.addTextChangedListener(mTextEditorWatcher)
 
+        chatAdapter.selectedMessagesLiveData.observe(this) { selectedMessages ->
+            toggleToolbar(selectedMessages)
+        }
+
         binding.voiceRecorderAndSendBtn.setOnClickListener {
             val message = binding.messageEditText.text.toString().trim()
             if (message.isNotEmpty()) {
@@ -129,6 +134,16 @@ class ChatActivity : AppCompatActivity() {
         // Initiate Voice Call
         binding.voiceCall.setOnClickListener {
             navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType)
+        }
+    }
+
+    private fun toggleToolbar(selectedMessages: List<Int>) {
+        if (selectedMessages.isNotEmpty()){ // Messages Are Selected
+            binding.toolbar.visibility = View.GONE
+            binding.selectedMessagesToolbar.toolbar.visibility = View.VISIBLE
+        } else { // Messages Are Not Selected
+            binding.toolbar.visibility = View.VISIBLE
+            binding.selectedMessagesToolbar.toolbar.visibility = View.GONE
         }
     }
 

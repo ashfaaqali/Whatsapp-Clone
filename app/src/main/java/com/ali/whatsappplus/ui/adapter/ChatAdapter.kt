@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ali.whatsappplus.R
@@ -33,6 +34,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
     RecyclerView.Adapter<ViewHolder>() {
     private var messageList: MutableList<BaseMessage> = ArrayList()
     private val selectedMessages: MutableList<Int> = mutableListOf()
+    val selectedMessagesLiveData = MutableLiveData<List<Int>>()
     private val TAG = "ChatAdapter"
 
     init {
@@ -174,7 +176,10 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
         // Long click listener to toggle message selection
         viewHolder.itemView.setOnLongClickListener {
-            if (selectedMessages.isEmpty()) selectedMessages.add(messageId)
+            if (selectedMessages.isEmpty()) {
+                selectedMessages.add(messageId)
+                selectedMessagesLiveData.value = selectedMessages
+            }
             Log.i(TAG, "Selected Message IDs: $selectedMessages")
             notifyItemChanged(viewHolder.adapterPosition) // Refresh view to update selection state
             true
@@ -195,11 +200,15 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         if (selectedMessages.contains(messageId)) {
             // If already selected, deselect the message
             selectedMessages.remove(messageId)
+            selectedMessagesLiveData.value = selectedMessages
+            Log.i(TAG, "SelectedMessagesLiveData: ${selectedMessagesLiveData.value}")
             Log.i(TAG, "Selected Message IDs: $selectedMessages")
         } else {
             // If not selected, select the message
             selectedMessages.add(messageId)
             Log.i(TAG, "Selected Message IDs: $selectedMessages")
+            Log.i(TAG, "SelectedMessagesLiveData: ${selectedMessagesLiveData.value}")
+            selectedMessagesLiveData.value = selectedMessages
         }
     }
 
@@ -326,7 +335,6 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
             }
         }
     }
-
 
     inner class LeftChatTextViewLong(val binding: LeftChatTextViewLongBinding) :
         ViewHolder(binding.root)

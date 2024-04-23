@@ -20,8 +20,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:gravity="center">
+            android:gravity="center"
+            android:padding="4dp">
 
             <ImageView
                 android:id="@+id/back"
@@ -43,13 +43,12 @@
         </LinearLayout>
 
 
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
             android:layout_weight="0.6"
             android:orientation="vertical"
-            android:layout_marginStart="2dp"
             android:padding="4dp">
 
             <TextView
@@ -83,9 +82,9 @@
             android:id="@+id/voice_call"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
             android:contentDescription="@string/search"
             android:padding="8dp"
-            android:layout_marginStart="3dp"
             android:src="@drawable/ic_voice"
             app:tint="@color/white" />
 
@@ -99,6 +98,10 @@
             app:tint="@color/white" />
     </LinearLayout>
 
+    <include
+        android:id="@+id/selected_messages_toolbar"
+        layout="@layout/selected_messages_toolbar"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_messages_recycler_view"
         android:layout_width="match_parent"
@@ -108,21 +111,21 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
         android:orientation="horizontal"
-        android:padding="4dp"
-        android:layout_marginBottom="6dp">
+        android:padding="4dp">
 
         <LinearLayout
             android:id="@+id/edit_text_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:background="@drawable/chat_screen_bottom_bg"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/voice_recorder_and_send_btn"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:layout_width="0dp"
@@ -138,13 +141,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.55"
+                android:autofillHints="@null"
+                android:backgroundTint="@android:color/transparent"
+                android:focusable="true"
                 android:hint="@string/message"
-                android:textColorHint="#868686"
                 android:imeOptions="actionDone"
                 android:inputType="text"
-                android:focusable="true"
-                android:backgroundTint="@android:color/transparent"
-                android:autofillHints="@null" />
+                android:textColorHint="#868686" />
 
             <ImageView
                 android:id="@+id/attachment_btn"
@@ -170,14 +173,14 @@
             android:id="@+id/voice_recorder_and_send_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/circular_bg"
             android:contentDescription="@string/camera"
             android:padding="12dp"
-            android:background="@drawable/circular_bg"
             android:src="@drawable/ic_mic"
-            app:tint="@color/white"
-            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintHorizontal_bias="1"
+            app:tint="@color/white" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
