@@ -8,13 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.LayoutParams
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.R.color
 import com.ali.whatsappplus.R.drawable.ic_delivered
 import com.ali.whatsappplus.R.drawable.ic_sent
-import com.ali.whatsappplus.databinding.ChatItemBinding
 import com.ali.whatsappplus.databinding.LeftChatImageViewBinding
 import com.ali.whatsappplus.databinding.LeftChatTextViewLongBinding
 import com.ali.whatsappplus.databinding.LeftChatTextViewShortBinding
@@ -34,18 +32,8 @@ import java.util.Locale
 class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
     RecyclerView.Adapter<ViewHolder>() {
     private var messageList: MutableList<BaseMessage> = ArrayList()
-    private var selectedMessageId = 0
-    private var longClickedMessageId: Int? = null
-    // Boolean flag to track if a message is selected or not
-    private var isMessageSelected: Boolean = false
-
-    // List to store indices of selected messages
-    private val selectedMessageIndices: MutableList<Int> = mutableListOf()
-    private lateinit var binding: ChatItemBinding
-    private lateinit var message: BaseMessage
+    private val selectedMessages: MutableList<Int> = mutableListOf()
     private val TAG = "ChatAdapter"
-
-    var messageLongPressListener: OnMessageLongPress? = null
 
     init {
         setMessageList(baseMessages)
@@ -53,7 +41,6 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
     // Setting messages list to the recycler view
     private fun setMessageList(messageList: List<BaseMessage>) {
-        Log.d(TAG, "setMessagesList called: $messageList")
         this.messageList.addAll(0, messageList)
         notifyItemRangeInserted(0, messageList.size)
     }
@@ -148,9 +135,6 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         val baseMessage = messageList[position]
         val messageId = baseMessage.id
 
-        // Set selected state based on whether the message is in selectedMessageIndices
-//        viewHolder.itemView.isSelected = selectedMessageIndices.contains(position)
-
         // Setting the data to the views according to the view type
         when (viewHolder.itemViewType) {
             Constants.LEFT_CHAT_TEXT_VIEW_LONG -> setTextData(
@@ -188,54 +172,45 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
             )
         }
 
-        // Set selected state based on whether the message is the currently long-clicked message
-        val isLongClicked = messageId == longClickedMessageId
-        viewHolder.itemView.isSelected = isLongClicked
-
         // Long click listener to toggle message selection
         viewHolder.itemView.setOnLongClickListener {
-            longClickedMessageId = messageId // Update the long-clicked message ID
-            notifyDataSetChanged() // Refresh view to update selection state
-            true // Consume the long click event
+            if (selectedMessages.isEmpty()) selectedMessages.add(messageId)
+            Log.i(TAG, "Selected Message IDs: $selectedMessages")
+            notifyItemChanged(viewHolder.adapterPosition) // Refresh view to update selection state
+            true
         }
 
-        // Show or hide messageSelectionView based on whether the message is long-clicked
-        val messageSelectionView = viewHolder.itemView.findViewById<View>(R.id.message_selection_view)
-        if (messageSelectionView != null) {
-            messageSelectionView.visibility = if (isLongClicked) View.VISIBLE else View.GONE
+        // Short click listener to toggle message selection
+        viewHolder.itemView.setOnClickListener {
+            if (selectedMessages.isNotEmpty()) {
+                toggleMessageSelection(messageId)
+                notifyItemChanged(viewHolder.adapterPosition) // Refresh view to update selection state
+            }
         }
+        // Select message
+        selectMessage(viewHolder, messageId)
     }
 
-    private fun toggleMessageSelection(baseMessage: BaseMessage, viewHolder: ViewHolder) {
-        val messageId = baseMessage.id
-        selectedMessageId = if (selectedMessageId == messageId) {
-            0 // Deselect the message
+    private fun toggleMessageSelection(messageId: Int) {
+        if (selectedMessages.contains(messageId)) {
+            // If already selected, deselect the message
+            selectedMessages.remove(messageId)
+            Log.i(TAG, "Selected Message IDs: $selectedMessages")
         } else {
-            messageId // Select the message
+            // If not selected, select the message
+            selectedMessages.add(messageId)
+            Log.i(TAG, "Selected Message IDs: $selectedMessages")
         }
-
-        // Toggle overall selection state
-        isMessageSelected = selectedMessageId != 0
-        notifyDataSetChanged() // Refresh view to update selection state
     }
 
-    private fun selectMessage(isSelected: Boolean, baseMessage: BaseMessage, viewHolder: ViewHolder) {
-
-        // Show or hide messageSelectionView based on selection state
-//        val messageSelectionView = viewHolder.itemView.findViewById<View>(R.id.message_selection_view)
-
-        if (viewHolder is RightChatTextViewLong) {
-            val messageSelectionView = viewHolder.binding.messageSelectionView
-            val messageConstraintLayout = viewHolder.binding.messageConstraintLayout
-
-            // Set the width and height of the message_selection_view
-            val layoutParams = messageSelectionView.layoutParams
-            layoutParams.width = LayoutParams.MATCH_PARENT
-            layoutParams.height = messageConstraintLayout.height
-            messageSelectionView.layoutParams = layoutParams
-
-            messageSelectionView.visibility = if (isSelected) View.VISIBLE else View.GONE
-        }
+    private fun selectMessage(
+        viewHolder: ViewHolder,
+        messageId: Int
+    ) {
+        val messageSelectionView =
+            viewHolder.itemView.findViewById<View>(R.id.message_selection_view)
+        messageSelectionView?.visibility =
+            if (selectedMessages.contains(messageId)) View.VISIBLE else View.GONE
     }
 
     // Set Image Message And Timestamp
@@ -260,21 +235,29 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         val baseMessage = messageList[position]
         val textMessage = (baseMessage as TextMessage)
 
-        if (viewHolder is LeftChatTextViewLong) {
-            viewHolder.binding.leftMessageTextView.text = textMessage.text
-            viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
-        } else if (viewHolder is LeftChatTextViewShort) {
-            viewHolder.binding.leftMessageTextView.text = textMessage.text
-            viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
-        } else if (viewHolder is RightChatTextViewLong) {
-            viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
-            viewHolder.binding.rightChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
-            setMessageStatusIcon(viewHolder, baseMessage)
-        } else {
-            viewHolder as RightChatTextViewShort
-            viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
-            viewHolder.binding.rightChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
-            setMessageStatusIcon(viewHolder, baseMessage)
+        when (viewHolder) {
+            is LeftChatTextViewLong -> {
+                viewHolder.binding.leftMessageTextView.text = textMessage.text
+                viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+            }
+
+            is LeftChatTextViewShort -> {
+                viewHolder.binding.leftMessageTextView.text = textMessage.text
+                viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+            }
+
+            is RightChatTextViewLong -> {
+                viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
+                viewHolder.binding.rightChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+                setMessageStatusIcon(viewHolder, baseMessage)
+            }
+
+            else -> {
+                viewHolder as RightChatTextViewShort
+                viewHolder.binding.rightChatMessageTxtView.text = textMessage.text
+                viewHolder.binding.rightChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+                setMessageStatusIcon(viewHolder, baseMessage)
+            }
         }
     }
 
@@ -361,10 +344,4 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
     inner class RightChatImageView(val binding: RightChatImageViewBinding) :
         ViewHolder(binding.root)
-//    inner class SelectedMessageView(val binding: ) :
-//        ViewHolder(binding.root)
-
-    interface OnMessageLongPress {
-        fun onMessageItemLongPress()
-    }
 }
