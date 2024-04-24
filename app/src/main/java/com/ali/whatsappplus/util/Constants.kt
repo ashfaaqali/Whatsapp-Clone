@@ -13,4 +13,6 @@ object Constants {
     const val RIGHT_CHAT_TEXT_VIEW_SHORT = 121
     const val RIGHT_CHAT_IMAGE_VIEW = 123
     const val LEFT_CHAT_IMAGE_VIEW = 122
+    const val RIGHT_DELETED_MESSAGE_VIEW = 333
+    const val LEFT_DELETED_MESSAGE_VIEW = 330
 }

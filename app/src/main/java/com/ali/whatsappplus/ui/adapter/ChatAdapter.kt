@@ -18,9 +18,11 @@ import com.ali.whatsappplus.R.drawable.ic_sent
 import com.ali.whatsappplus.databinding.LeftChatImageViewBinding
 import com.ali.whatsappplus.databinding.LeftChatTextViewLongBinding
 import com.ali.whatsappplus.databinding.LeftChatTextViewShortBinding
+import com.ali.whatsappplus.databinding.LeftDeletedMessageLayoutBinding
 import com.ali.whatsappplus.databinding.RightChatImageViewBinding
 import com.ali.whatsappplus.databinding.RightChatTextViewLongBinding
 import com.ali.whatsappplus.databinding.RightChatTextViewShortBinding
+import com.ali.whatsappplus.databinding.RightDeletedMessageLayoutBinding
 import com.ali.whatsappplus.util.Constants
 import com.bumptech.glide.Glide
 import com.cometchat.chat.core.CometChat
@@ -54,28 +56,52 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         val sender = baseMessage.sender.uid
 
         // Checking and returning view type to OnCreateViewHolder
-        return if (baseMessage is TextMessage) {
-            // Two different views are being returned here according to the message length just like in WhatsApp.
-            if (sender == loggedInUser) {
-                // If message length is greater than 30 return a layout with timestamp and status icon below the message.
-                if (baseMessage.text.length > 30) Constants.RIGHT_CHAT_TEXT_VIEW_LONG
-                // else return a layout with timestamp and status icon next to the message.
-                else Constants.RIGHT_CHAT_TEXT_VIEW_SHORT
+        if (baseMessage.deletedAt == 0L) {
+            return if (baseMessage is TextMessage) {
+                // Two different views are being returned here according to the message length just like in WhatsApp.
+                if (sender == loggedInUser) {
+                    // If message length is greater than 30 return a layout with timestamp and status icon below the message.
+                    if (baseMessage.text.length > 30) Constants.RIGHT_CHAT_TEXT_VIEW_LONG
+                    // else return a layout with timestamp and status icon next to the message.
+                    else Constants.RIGHT_CHAT_TEXT_VIEW_SHORT
+                } else {
+                    // Same thing on left side, Timestamp and status icon below the message.
+                    if (baseMessage.text.length > 30) Constants.LEFT_CHAT_TEXT_VIEW_LONG
+                    // Timestamp and status icon next to the message.
+                    else Constants.LEFT_CHAT_TEXT_VIEW_SHORT
+                }
+            } else if (baseMessage is MediaMessage) {
+                if (sender == loggedInUser) Constants.RIGHT_CHAT_IMAGE_VIEW
+                else Constants.LEFT_CHAT_IMAGE_VIEW
+            } else -1
+        } else {
+            return if (sender == loggedInUser) {
+                Constants.RIGHT_DELETED_MESSAGE_VIEW
             } else {
-                // Same thing on left side, Timestamp and status icon below the message.
-                if (baseMessage.text.length > 30) Constants.LEFT_CHAT_TEXT_VIEW_LONG
-                // Timestamp and status icon next to the message.
-                else Constants.LEFT_CHAT_TEXT_VIEW_SHORT
+                Constants.LEFT_DELETED_MESSAGE_VIEW
             }
-        } else if (baseMessage is MediaMessage) {
-            if (sender == loggedInUser) Constants.RIGHT_CHAT_IMAGE_VIEW
-            else Constants.LEFT_CHAT_IMAGE_VIEW
-        } else -1
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // Returning the appropriate view according to the ItemViewType
         return when (viewType) {
+            Constants.RIGHT_DELETED_MESSAGE_VIEW -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val itemBinding: RightDeletedMessageLayoutBinding =
+                    RightDeletedMessageLayoutBinding.inflate(layoutInflater, parent, false)
+                itemBinding.root.tag = Constants.RIGHT_DELETED_MESSAGE_VIEW
+                RightChatDeletedMessageView(itemBinding)
+            }
+
+            Constants.LEFT_DELETED_MESSAGE_VIEW -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val itemBinding: LeftDeletedMessageLayoutBinding =
+                    LeftDeletedMessageLayoutBinding.inflate(layoutInflater, parent, false)
+                itemBinding.root.tag = Constants.LEFT_DELETED_MESSAGE_VIEW
+                LeftChatDeletedMessageView(itemBinding)
+            }
+
             Constants.LEFT_CHAT_TEXT_VIEW_LONG -> {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val textMessageItemBinding: LeftChatTextViewLongBinding =
@@ -124,13 +150,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
                 LeftChatImageView(imageMessageItemBinding)
             }
 
-            else -> {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val imageMessageItemBinding: LeftChatImageViewBinding =
-                    LeftChatImageViewBinding.inflate(layoutInflater, parent, false)
-                imageMessageItemBinding.root.tag = Constants.LEFT_CHAT_IMAGE_VIEW
-                LeftChatImageView(imageMessageItemBinding)
-            }
+            else -> throw IllegalArgumentException("Invalid viewType: $viewType")
         }
     }
 
@@ -140,6 +160,11 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
         // Setting the data to the views according to the view type
         when (viewHolder.itemViewType) {
+            Constants.LEFT_DELETED_MESSAGE_VIEW -> setDeletedMessageData(
+                viewHolder as LeftChatDeletedMessageView,
+                position
+            )
+
             Constants.LEFT_CHAT_TEXT_VIEW_LONG -> setTextData(
                 viewHolder as LeftChatTextViewLong,
                 position
@@ -179,6 +204,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         viewHolder.itemView.setOnLongClickListener {
             if (selectedMessages.isEmpty()) {
                 toggleMessageSelection(baseMessage)
+                Log.d(TAG, "${viewHolder.itemViewType}")
             }
             notifyItemChanged(viewHolder.adapterPosition) // Refresh view to update selection state
             true
@@ -193,6 +219,18 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         }
         // Select message
         selectMessage(viewHolder, messageId)
+    }
+
+    private fun setDeletedMessageData(viewHolder: ViewHolder, position: Int) {
+        when (viewHolder) {
+            is LeftChatDeletedMessageView -> {
+                viewHolder.binding.leftDeletedMessage.visibility = View.VISIBLE
+            }
+
+            is RightChatDeletedMessageView -> {
+                viewHolder.binding.rightDeletedMessage.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun toggleMessageSelection(baseMessage: BaseMessage) {
@@ -224,7 +262,6 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
     private fun setImageData(viewHolder: ViewHolder, position: Int) {
         val baseMessage = messageList[position]
         val mediaMessage = (baseMessage as MediaMessage)
-        Log.i(TAG, "File URL: ${mediaMessage.attachment.fileUrl}")
         if (viewHolder is LeftChatImageView) {
             Glide.with(context)
                 .load(mediaMessage.attachment.fileUrl)
@@ -271,6 +308,29 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
     // Update the list on fetchPrevious
     fun updateList(baseMessageList: List<BaseMessage>) {
         setMessageList(baseMessageList)
+    }
+
+    fun removeMessage(baseMessage: BaseMessage) {
+        if (messageList.contains(baseMessage)) {
+            val index = messageList.indexOf(baseMessage)
+            messageList.removeAt(index)
+            notifyItemRemoved(index)
+            // Add the deleted message at the same index
+            addDeletedMessage(baseMessage, index)
+            selectedMessages.remove(baseMessage.id)
+            selectedMessagesLiveData.value = selectedMessages.keys.toList()
+        }
+    }
+
+    private fun addDeletedMessage(baseMessage: BaseMessage, index: Int) {
+        if (baseMessage.sender.uid == CometChat.getLoggedInUser().uid) {
+            // Right side deleted message
+            messageList.add(index, baseMessage)
+        } else {
+            // Left side deleted message
+            messageList.add(index, baseMessage)
+        }
+        notifyItemInserted(index)
     }
 
     // Get message timestamp
@@ -350,5 +410,11 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         ViewHolder(binding.root)
 
     inner class RightChatImageView(val binding: RightChatImageViewBinding) :
+        ViewHolder(binding.root)
+
+    inner class LeftChatDeletedMessageView(val binding: LeftDeletedMessageLayoutBinding) :
+        ViewHolder(binding.root)
+
+    inner class RightChatDeletedMessageView(val binding: RightDeletedMessageLayoutBinding) :
         ViewHolder(binding.root)
 }

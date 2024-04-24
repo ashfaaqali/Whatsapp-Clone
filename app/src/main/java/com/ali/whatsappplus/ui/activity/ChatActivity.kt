@@ -49,6 +49,7 @@ class ChatActivity : AppCompatActivity() {
     private val TAG = "ChatActivity"
     private lateinit var chatAdapter: ChatAdapter
     private val messageList = mutableListOf<BaseMessage>()
+    private var selectedMessages: List<Int> = emptyList()
     private lateinit var typingIndicator: TypingIndicator
     private var receiverId = ""
     private var receiverType = ""
@@ -60,7 +61,6 @@ class ChatActivity : AppCompatActivity() {
     private var messagesRequest: MessagesRequest? = null
     private var latestReceivedMessageId = 0
     private lateinit var bottomSheetDialog: AttachmentsBottomSheet
-
 
     private val mTextEditorWatcher: TextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -109,15 +109,26 @@ class ChatActivity : AppCompatActivity() {
         handleIntentData()
         setUserData()
         setupRecyclerView()
-//        fetchMissedMessages()
-//        fetchUnreadMessages()
+        // fetchMissedMessages()
+        // fetchUnreadMessages()
         fetchMessage()
 
         binding.messageEditText.addTextChangedListener(mTextEditorWatcher)
 
+        // Observe The LiveData For Selected Messages
         chatAdapter.getSelectedMessagesLiveData().observe(this) { selectedMessages ->
             toggleToolbar(selectedMessages)
-            binding.selectedMessagesToolbar.contactName.text = selectedMessages.size.toString()
+            this.selectedMessages = selectedMessages
+        }
+
+        binding.selectedMessagesToolbar.imgDelete.setOnClickListener {
+            if (selectedMessages.isNotEmpty()) {
+                val messageIds = selectedMessages.toList()
+                // Loop To Delete The Selected Messages
+                for (messageId in messageIds) {
+                    deleteSelectedMessage(messageId)
+                }
+            }
         }
 
         binding.voiceRecorderAndSendBtn.setOnClickListener {
@@ -138,10 +149,26 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
+    private fun deleteSelectedMessage(messageId: Int) {
+        CometChat.deleteMessage(messageId, object : CallbackListener<BaseMessage>() {
+            override fun onSuccess(message: BaseMessage) {
+                Log.d(TAG, "deleteMessage onSuccess : " + message.deletedAt)
+                chatAdapter.removeMessage(message)
+            }
+
+            override fun onError(e: CometChatException) {
+                Log.d(TAG, "deleteMessage onError : " + e.message)
+            }
+
+        })
+    }
+
     private fun toggleToolbar(selectedMessages: List<Int>) {
-        if (selectedMessages.isNotEmpty()){ // Messages Are Selected
+        if (selectedMessages.isNotEmpty()) { // Messages Are Selected
             binding.toolbar.visibility = View.GONE
             binding.selectedMessagesToolbar.toolbar.visibility = View.VISIBLE
+            binding.selectedMessagesToolbar.selectedMessagesCount.text =
+                selectedMessages.size.toString()
         } else { // Messages Are Not Selected
             binding.toolbar.visibility = View.VISIBLE
             binding.selectedMessagesToolbar.toolbar.visibility = View.GONE
@@ -155,8 +182,6 @@ class ChatActivity : AppCompatActivity() {
 
     // Image Picker Intent
     fun openImagePicker() {
-//        val intent = Intent(Intent.ACTION_GET_CONTENT)
-//        intent.type = "image/*"
         imagePickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo))
     }
 
@@ -202,6 +227,8 @@ class ChatActivity : AppCompatActivity() {
                 MessagesRequest.MessagesRequestBuilder()
                     .setLimit(10)
                     .setUID(receiverId)
+                    .setTypes(arrayListOf("text", "image"))
+                    .setCategories(arrayListOf("message"))
                     .build()
             } else {
                 MessagesRequest.MessagesRequestBuilder()
@@ -213,6 +240,13 @@ class ChatActivity : AppCompatActivity() {
 
         messagesRequest?.fetchPrevious(object : CallbackListener<List<BaseMessage>>() {
             override fun onSuccess(baseMessages: List<BaseMessage>) {
+                for (message in baseMessages) {
+                    if (message is TextMessage) {
+                        Log.d(TAG, "Text message received successfully: $message")
+                    } else if (message is MediaMessage) {
+                        Log.d(TAG, "Media message received successfully: $message")
+                    }
+                }
                 if (baseMessages.isNotEmpty()) {
                     val baseMessage = baseMessages[baseMessages.size - 1]
                     markAsRead(baseMessage)
