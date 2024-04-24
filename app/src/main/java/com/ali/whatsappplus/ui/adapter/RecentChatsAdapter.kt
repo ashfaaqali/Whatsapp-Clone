@@ -1,10 +1,13 @@
 package com.ali.whatsappplus.ui.adapter
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.RecentChatItemBinding
 import com.bumptech.glide.Glide
 import com.cometchat.chat.core.CometChat
@@ -17,7 +20,10 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-class RecentChatsAdapter(private var conversationList: List<Conversation>) :
+class RecentChatsAdapter(
+    val context: Context,
+    private var conversationList: List<Conversation>
+) :
     RecyclerView.Adapter<RecentChatsAdapter.MyViewHolder>() {
 
     var listener: OnChatItemClickListener? = null
@@ -60,10 +66,15 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
 
             // Check message type
             if (message is TextMessage) {
-                lastMessage.text = message.text
+                if (message.deletedAt == 0L) {
+                    lastMessage.text = message.text
+                } else {
+                    lastMessage.text =
+                        ContextCompat.getString(context, R.string.this_messages_was_deleted)
+                }
             }
 
-            if (message.sender == currentUser){
+            if (message.sender == currentUser) {
                 lastMessageTime.text = formatTime(message.sentAt)
             } else {
                 lastMessageTime.text = formatTime(message.deliveredToMeAt)
@@ -86,10 +97,20 @@ class RecentChatsAdapter(private var conversationList: List<Conversation>) :
         // Click listener for conversations
         holder.itemView.setOnClickListener {
             if (entity is User) {
-                listener?.onChatItemClicked(entity.name, entity.uid, entity.avatar, conversation.lastMessage.receiverType)
+                listener?.onChatItemClicked(
+                    entity.name,
+                    entity.uid,
+                    entity.avatar,
+                    conversation.lastMessage.receiverType
+                )
             }
             if (entity is Group) {
-                listener?.onChatItemClicked(entity.name, entity.guid, entity.icon, conversation.lastMessage.receiverType)
+                listener?.onChatItemClicked(
+                    entity.name,
+                    entity.guid,
+                    entity.icon,
+                    conversation.lastMessage.receiverType
+                )
             }
         }
     }

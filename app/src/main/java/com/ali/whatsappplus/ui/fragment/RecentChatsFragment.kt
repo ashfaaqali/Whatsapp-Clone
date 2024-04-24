@@ -38,7 +38,7 @@ class RecentChatsFragment : Fragment() {
     ): View {
         binding = FragmentRecentChatsBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this)[RecentChatsViewModel::class.java]
-        adapter = RecentChatsAdapter(emptyList())
+        adapter = RecentChatsAdapter(requireContext(), emptyList())
         // Handling Item Click
         adapter.listener = object : RecentChatsAdapter.OnChatItemClickListener {
             override fun onChatItemClicked(
