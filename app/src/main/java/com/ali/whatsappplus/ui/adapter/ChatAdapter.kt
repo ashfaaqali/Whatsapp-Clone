@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -33,8 +34,8 @@ import java.util.Locale
 class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
     RecyclerView.Adapter<ViewHolder>() {
     private var messageList: MutableList<BaseMessage> = ArrayList()
-    private val selectedMessages: MutableList<Int> = mutableListOf()
-    val selectedMessagesLiveData = MutableLiveData<List<Int>>()
+    private val selectedMessages: HashMap<Int, BaseMessage> = HashMap()
+    private val selectedMessagesLiveData = MutableLiveData<List<Int>>()
     private val TAG = "ChatAdapter"
 
     init {
@@ -177,10 +178,8 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         // Long click listener to toggle message selection
         viewHolder.itemView.setOnLongClickListener {
             if (selectedMessages.isEmpty()) {
-                selectedMessages.add(messageId)
-                selectedMessagesLiveData.value = selectedMessages
+                toggleMessageSelection(baseMessage)
             }
-            Log.i(TAG, "Selected Message IDs: $selectedMessages")
             notifyItemChanged(viewHolder.adapterPosition) // Refresh view to update selection state
             true
         }
@@ -188,7 +187,7 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         // Short click listener to toggle message selection
         viewHolder.itemView.setOnClickListener {
             if (selectedMessages.isNotEmpty()) {
-                toggleMessageSelection(messageId)
+                toggleMessageSelection(baseMessage)
                 notifyItemChanged(viewHolder.adapterPosition) // Refresh view to update selection state
             }
         }
@@ -196,20 +195,15 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         selectMessage(viewHolder, messageId)
     }
 
-    private fun toggleMessageSelection(messageId: Int) {
-        if (selectedMessages.contains(messageId)) {
+    private fun toggleMessageSelection(baseMessage: BaseMessage) {
+        if (selectedMessages.containsKey(baseMessage.id)) {
             // If already selected, deselect the message
-            selectedMessages.remove(messageId)
-            selectedMessagesLiveData.value = selectedMessages
-            Log.i(TAG, "SelectedMessagesLiveData: ${selectedMessagesLiveData.value}")
-            Log.i(TAG, "Selected Message IDs: $selectedMessages")
+            selectedMessages.remove(baseMessage.id)
         } else {
             // If not selected, select the message
-            selectedMessages.add(messageId)
-            Log.i(TAG, "Selected Message IDs: $selectedMessages")
-            Log.i(TAG, "SelectedMessagesLiveData: ${selectedMessagesLiveData.value}")
-            selectedMessagesLiveData.value = selectedMessages
+            selectedMessages[baseMessage.id] = baseMessage
         }
+        selectedMessagesLiveData.value = selectedMessages.keys.toList()
     }
 
     private fun selectMessage(
@@ -220,6 +214,10 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
             viewHolder.itemView.findViewById<View>(R.id.message_selection_view)
         messageSelectionView?.visibility =
             if (selectedMessages.contains(messageId)) View.VISIBLE else View.GONE
+    }
+
+    fun getSelectedMessagesLiveData(): LiveData<List<Int>> {
+        return selectedMessagesLiveData
     }
 
     // Set Image Message And Timestamp

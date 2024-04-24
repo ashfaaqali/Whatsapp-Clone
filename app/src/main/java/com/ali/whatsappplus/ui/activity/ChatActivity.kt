@@ -115,8 +115,9 @@ class ChatActivity : AppCompatActivity() {
 
         binding.messageEditText.addTextChangedListener(mTextEditorWatcher)
 
-        chatAdapter.selectedMessagesLiveData.observe(this) { selectedMessages ->
+        chatAdapter.getSelectedMessagesLiveData().observe(this) { selectedMessages ->
             toggleToolbar(selectedMessages)
+            binding.selectedMessagesToolbar.contactName.text = selectedMessages.size.toString()
         }
 
         binding.voiceRecorderAndSendBtn.setOnClickListener {
