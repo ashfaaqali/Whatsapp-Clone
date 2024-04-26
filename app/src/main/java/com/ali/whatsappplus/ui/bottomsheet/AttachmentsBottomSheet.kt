@@ -60,6 +60,27 @@ class AttachmentsBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
+        binding.contacts.setOnClickListener {
+            Toast.makeText(context, "Send Contacts", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.document.setOnClickListener {
+            Toast.makeText(context, "Send Documents", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.location.setOnClickListener {
+            Toast.makeText(context, "Send Location", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.audio.setOnClickListener {
+            Toast.makeText(context, "Send Audio", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.camera.setOnClickListener {
+            Toast.makeText(context, "Click Picture", Toast.LENGTH_SHORT).show()
+        }
+
+
         return dialog
     }
 
