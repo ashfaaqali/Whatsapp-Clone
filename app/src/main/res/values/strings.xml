@@ -24,4 +24,5 @@
     <string name="online">online</string>
     <string name="end_to_end_encrypted">End-to-end encrypted</string>
     <string name="this_messages_was_deleted">This messages was deleted</string>
+    <string name="add_members">Add members</string>
 </resources>

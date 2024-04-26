@@ -76,7 +76,7 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:layout_marginTop="8dp"
-        android:paddingVertical="10dp"
+        android:paddingVertical="8dp"
         android:paddingHorizontal="16dp">
 
         <ImageView
@@ -105,7 +105,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingVertical="10dp"
+        android:paddingVertical="8dp"
         android:paddingHorizontal="16dp">
 
         <ImageView

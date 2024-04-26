@@ -15,4 +15,7 @@ object Constants {
     const val LEFT_CHAT_IMAGE_VIEW = 122
     const val RIGHT_DELETED_MESSAGE_VIEW = 333
     const val LEFT_DELETED_MESSAGE_VIEW = 330
+    const val FRAGMENT_TO_LOAD = "fragment"
+    const val FRAGMENT_SELECT_GROUP_MEMBERS = "select_group_members"
+    const val FRAGMENT_GROUP_DETAILS = "group_info"
 }

@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ali.whatsappplus.databinding.ActivityContactsBinding
 import com.ali.whatsappplus.ui.adapter.AllContactsAdapter
+import com.ali.whatsappplus.util.Constants
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.UsersRequest
 import com.cometchat.chat.core.UsersRequest.UsersRequestBuilder
@@ -25,9 +26,27 @@ class ContactsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityContactsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         recyclerViewSetup()
+        // Click listener for contacts
+        adapter.listener = object : AllContactsAdapter.OnContactItemClickListener {
+            override fun onContactItemClicked(user: User) {
+                navigateToChatActivity(user)
+            }
+        }
+        fetchUsers()
 
+        binding.newGroup.setOnClickListener {
+            navigateToSelectGroupMembersActivity()
+        }
+    }
+
+    private fun navigateToSelectGroupMembersActivity() {
+        val intent = Intent(this, GroupActivity::class.java)
+        intent.putExtra(Constants.FRAGMENT_TO_LOAD, Constants.FRAGMENT_SELECT_GROUP_MEMBERS)
+        startActivity(intent)
+    }
+
+    private fun fetchUsers() {
         // Request For Users
         usersRequest = UsersRequestBuilder()
             .setLimit(30)
@@ -46,13 +65,6 @@ class ContactsActivity : AppCompatActivity() {
                 Log.i(TAG, "$p0")
             }
         })
-
-        // Click listener for contacts
-        adapter.listener = object : AllContactsAdapter.OnContactItemClickListener{
-            override fun onContactItemClicked(user: User) {
-                navigateToChatActivity(user)
-            }
-        }
     }
 
     private fun recyclerViewSetup() {
