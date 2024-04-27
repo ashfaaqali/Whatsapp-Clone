@@ -25,4 +25,11 @@
     <string name="end_to_end_encrypted">End-to-end encrypted</string>
     <string name="this_messages_was_deleted">This messages was deleted</string>
     <string name="add_members">Add members</string>
+    <string name="group_name">Group name</string>
+    <string name="public_String">Public</string>
+    <string name="private_string">Private</string>
+    <string name="protected_string">Protected</string>
+    <string name="group_privacy">Group privacy</string>
+    <string name="members">Members:</string>
+    <string name="password">Password</string>
 </resources>
