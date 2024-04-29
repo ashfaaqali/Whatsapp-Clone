@@ -3,6 +3,7 @@ package com.ali.whatsappplus.ui.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.AllContactsItemBinding
 import com.bumptech.glide.Glide
 import com.cometchat.chat.models.User
@@ -31,9 +32,13 @@ class AllContactsAdapter(private var userList: List<User>) :
             contactName.text = user.name
             contactStatus.text = user.status
 
-            Glide.with(holder.itemView)
-                .load(user.avatar)
-                .into(profilePic)
+            if (user.avatar!=null){
+                Glide.with(holder.itemView)
+                    .load(user.avatar)
+                    .into(profilePic)
+            } else {
+                profilePic.setImageResource(R.drawable.ic_user_profile)
+            }
         }
 
         holder.itemView.setOnClickListener{

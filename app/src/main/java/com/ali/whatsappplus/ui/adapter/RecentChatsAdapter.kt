@@ -1,6 +1,7 @@
 package com.ali.whatsappplus.ui.adapter
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,7 @@ import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.RecentChatItemBinding
 import com.bumptech.glide.Glide
 import com.cometchat.chat.core.CometChat
+import com.cometchat.chat.models.Action
 import com.cometchat.chat.models.Conversation
 import com.cometchat.chat.models.Group
 import com.cometchat.chat.models.TextMessage
@@ -52,16 +54,30 @@ class RecentChatsAdapter(
         with(holder.binding) {
 
             // Check if the conversation is with User or Group
-            if (entity is User) {
+            if (entity is User) { // If entity is User
                 conversationName.text = entity.name
-                Glide.with(holder.itemView)
-                    .load(entity.avatar)
-                    .into(profilePic)
-            } else if (entity is Group) {
+                if (entity.avatar != null) {
+                    Glide.with(holder.itemView)
+                        .load(entity.avatar)
+                        .into(profilePic)
+                } else {
+                    profilePic.setImageResource(R.drawable.ic_user_profile)
+                }
+
+
+            } else if (entity is Group) { // If entity is Group
                 conversationName.text = entity.name
-                Glide.with(holder.itemView)
-                    .load(entity.icon)
-                    .into(profilePic)
+                if (entity.icon != null) {
+                    Glide.with(holder.itemView)
+                        .load(entity.icon)
+                        .into(profilePic)
+                } else {
+                    profilePic.setImageResource(R.drawable.ic_group_profile)
+                    profilePic.setPadding(20, 20, 20, 20)
+                    profilePic.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
+                    profilePic.background = ContextCompat.getDrawable(context, R.drawable.circular_bg)
+                    profilePic.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_shade))
+                }
             }
 
             // Check message type
@@ -69,9 +85,12 @@ class RecentChatsAdapter(
                 if (message.deletedAt == 0L) {
                     lastMessage.text = message.text
                 } else {
+                    Log.wtf(TAG, "Last message: ${message.text}")
                     lastMessage.text =
                         ContextCompat.getString(context, R.string.this_messages_was_deleted)
                 }
+            } else if (message is Action){
+                lastMessage.text = message.message
             }
 
             if (message.sender == currentUser) {
@@ -132,7 +151,12 @@ class RecentChatsAdapter(
     }
 
     interface OnChatItemClickListener {
-        fun onChatItemClicked(username: String, uid: String, avatar: String, receiverType: String)
+        fun onChatItemClicked(
+            username: String,
+            uid: String,
+            avatar: String? = null,
+            receiverType: String
+        )
     }
 }
 

@@ -44,7 +44,7 @@ class RecentChatsFragment : Fragment() {
             override fun onChatItemClicked(
                 username: String,
                 uid: String,
-                avatar: String,
+                avatar: String?,
                 receiverType: String
             ) {
                 navigateToChatActivity(username, uid, avatar, receiverType)
@@ -130,7 +130,7 @@ class RecentChatsFragment : Fragment() {
     private fun navigateToChatActivity(
         name: String,
         uid: String,
-        avatar: String,
+        avatar: String? = null,
         receiverType: String
     ) {
         val intent = Intent(requireContext(), ChatActivity::class.java)

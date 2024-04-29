@@ -1,5 +1,6 @@
 package com.ali.whatsappplus.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.FragmentGroupDetailsBinding
+import com.ali.whatsappplus.ui.activity.ChatActivity
 import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.CometChat.CreateGroupWithMembersListener
@@ -110,9 +112,10 @@ class GroupDetailsFragment : Fragment() {
             selectedMembers,
             null,
             object : CreateGroupWithMembersListener() {
-                override fun onSuccess(p0: Group?, p1: HashMap<String, String>?) {
-                    Log.i(tag, "createGroupWithMembers onSuccess: $p0, $p1")
-                    Logger.error(p0.toString(), p1.toString())
+                override fun onSuccess(group: Group, p1: HashMap<String, String>?) {
+                    Log.i(tag, "createGroupWithMembers onSuccess: $group, $p1")
+                    Logger.error(group.toString(), p1.toString())
+                    navigateToGroupChat(group)
                 }
 
                 override fun onError(p0: CometChatException?) {
@@ -120,6 +123,14 @@ class GroupDetailsFragment : Fragment() {
                 }
 
             })
+    }
+
+    private fun navigateToGroupChat(group: Group) {
+        val intent = Intent(requireContext(), ChatActivity::class.java)
+        intent.putExtra("name", group.name)
+        intent.putExtra("receiverId", group.guid)
+        intent.putExtra("avatar", group.icon)
+        startActivity(intent)
     }
 
     private fun getGuid(): String {

@@ -1,6 +1,7 @@
 package com.ali.whatsappplus.ui.activity
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -12,6 +13,7 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ali.whatsappplus.R
@@ -54,7 +56,7 @@ class ChatActivity : AppCompatActivity() {
     private var receiverId = ""
     private var receiverType = ""
     private var userName = ""
-    private var userAvatar = ""
+    private var userAvatar: String? = null
     private var hasNoMoreMessages = false
     private var isInProgress = false
     private lateinit var layoutManager: LinearLayoutManager
@@ -419,7 +421,8 @@ class ChatActivity : AppCompatActivity() {
     private fun handleIntentData() {
         if (intent != null) {
             userName = intent.getStringExtra("name").toString()
-            userAvatar = intent.getStringExtra("avatar").toString()
+            userAvatar = intent.getStringExtra("avatar")
+            Log.i(TAG, "userAvatar: $userAvatar")
             receiverId = intent.getStringExtra("receiverId").toString()
             receiverType = intent.getStringExtra("receiverType").toString()
         } else {
@@ -465,15 +468,27 @@ class ChatActivity : AppCompatActivity() {
     // Set user data (Profile picture, name etc)
     private fun setUserData() {
         binding.contactName.text = userName
-        Glide.with(this)
-            .load(userAvatar)
-            .into(binding.profilePic)
+        if (userAvatar != null) {
+            Glide.with(this)
+                .load(userAvatar)
+                .into(binding.profilePic)
+        } else {
+            if (receiverType == "user") binding.profilePic.setImageResource(R.drawable.ic_user_profile)
+            else {
+                binding.profilePic.setImageResource(R.drawable.ic_group_profile)
+                binding.profilePic.setPadding(20, 20, 20, 20)
+                binding.profilePic.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
+                binding.profilePic.background = ContextCompat.getDrawable(this, R.drawable.circular_bg)
+                binding.profilePic.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_shade))
+            }
+
+        }
     }
 
     private fun navigateToVoiceCallActivity(
         name: String,
         uid: String,
-        avatar: String,
+        avatar: String?,
         receiverType: String
     ) {
         val intent = Intent(this, VoiceCall::class.java)

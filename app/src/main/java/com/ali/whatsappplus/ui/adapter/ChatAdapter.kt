@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,6 +16,7 @@ import com.ali.whatsappplus.R
 import com.ali.whatsappplus.R.color
 import com.ali.whatsappplus.R.drawable.ic_delivered
 import com.ali.whatsappplus.R.drawable.ic_sent
+import com.ali.whatsappplus.databinding.ActionMessageViewBinding
 import com.ali.whatsappplus.databinding.LeftChatImageViewBinding
 import com.ali.whatsappplus.databinding.LeftChatTextViewLongBinding
 import com.ali.whatsappplus.databinding.LeftChatTextViewShortBinding
@@ -25,10 +27,13 @@ import com.ali.whatsappplus.databinding.RightChatTextViewShortBinding
 import com.ali.whatsappplus.databinding.RightDeletedMessageLayoutBinding
 import com.ali.whatsappplus.util.Constants
 import com.bumptech.glide.Glide
+import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat
+import com.cometchat.chat.models.Action
 import com.cometchat.chat.models.BaseMessage
 import com.cometchat.chat.models.MediaMessage
 import com.cometchat.chat.models.TextMessage
+import com.cometchat.chat.models.User
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -73,6 +78,8 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
             } else if (baseMessage is MediaMessage) {
                 if (sender == loggedInUser) Constants.RIGHT_CHAT_IMAGE_VIEW
                 else Constants.LEFT_CHAT_IMAGE_VIEW
+            } else if (baseMessage is Action) {
+                Constants.ACTION_MESSAGE_VIEW
             } else -1
         } else {
             return if (sender == loggedInUser) {
@@ -150,7 +157,13 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
                 LeftChatImageView(imageMessageItemBinding)
             }
 
-            else -> throw IllegalArgumentException("Invalid viewType: $viewType")
+            else -> {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val actionItemBinding: ActionMessageViewBinding =
+                    ActionMessageViewBinding.inflate(layoutInflater, parent, false)
+                actionItemBinding.root.tag = Constants.ACTION_MESSAGE_VIEW
+                ActionMessageView(actionItemBinding)
+            }
         }
     }
 
@@ -198,6 +211,11 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
                 viewHolder as RightChatImageView,
                 position
             )
+
+            Constants.ACTION_MESSAGE_VIEW -> setActionData(
+                viewHolder as ActionMessageView,
+                position
+            )
         }
 
         // Long click listener to toggle message selection
@@ -219,6 +237,24 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         }
         // Select message
         selectMessage(viewHolder, messageId)
+    }
+
+    private fun setActionData(viewHolder: ViewHolder, position: Int) {
+        val baseMessage = messageList[position]
+        val message = baseMessage as Action
+        val actionMessage: TextView = viewHolder.itemView.findViewById(R.id.action_message)
+
+        when (message.action) {
+            CometChatConstants.ActionKeys.ACTION_MEMBER_ADDED -> {
+                val memberAdded = message.actionOn
+                val currentUser = CometChat.getLoggedInUser()
+                if (memberAdded is User) {
+                    val text = currentUser.name + " added " + memberAdded.name
+                    Log.wtf(TAG, "Action: $text")
+                    actionMessage.text = text
+                }
+            }
+        }
     }
 
     private fun setDeletedMessageData(viewHolder: ViewHolder, position: Int) {
@@ -281,6 +317,9 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
         when (viewHolder) {
             is LeftChatTextViewLong -> {
+                if (baseMessage.receiverType == CometChatConstants.RECEIVER_TYPE_GROUP) {
+
+                }
                 viewHolder.binding.leftMessageTextView.text = textMessage.text
                 viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
             }
@@ -416,5 +455,8 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         ViewHolder(binding.root)
 
     inner class RightChatDeletedMessageView(val binding: RightDeletedMessageLayoutBinding) :
+        ViewHolder(binding.root)
+
+    inner class ActionMessageView(val binding: ActionMessageViewBinding) :
         ViewHolder(binding.root)
 }
