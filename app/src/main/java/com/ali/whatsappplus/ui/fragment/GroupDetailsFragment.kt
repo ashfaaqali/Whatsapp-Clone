@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.ali.whatsappplus.R
@@ -59,6 +60,10 @@ class GroupDetailsFragment : Fragment() {
             else binding.passwordEditText.visibility = View.GONE
         }
 
+        binding.backBtn.setOnClickListener {
+            activity?.finish()
+        }
+
         binding.checkMarkFab.setOnClickListener {
             val groupName = binding.groupNameEditText.text.toString()
             val passwordEditText = binding.passwordEditText
@@ -71,6 +76,14 @@ class GroupDetailsFragment : Fragment() {
         }
 
 
+    }
+
+    private fun handleBackPress() {
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                activity?.finish()
+            }
+        })
     }
 
     private fun showToast(field: String) {
@@ -131,6 +144,7 @@ class GroupDetailsFragment : Fragment() {
         intent.putExtra("receiverId", group.guid)
         intent.putExtra("avatar", group.icon)
         startActivity(intent)
+        activity?.finish()
     }
 
     private fun getGuid(): String {

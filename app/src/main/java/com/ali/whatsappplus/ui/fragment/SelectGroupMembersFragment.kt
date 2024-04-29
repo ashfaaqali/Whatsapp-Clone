@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ali.whatsappplus.databinding.FragmentSelectGroupMembersBinding
 import com.ali.whatsappplus.ui.activity.GroupActivity
@@ -47,6 +48,10 @@ class SelectGroupMembersFragment : Fragment() {
             if (selectedMembers.isNotEmpty()) navigateToGroupDetails()
             else showToast()
         }
+
+        binding.back.setOnClickListener {
+            activity?.finish()
+        }
     }
 
     private fun navigateToGroupDetails() {
@@ -54,6 +59,15 @@ class SelectGroupMembersFragment : Fragment() {
         intent.putExtra(Constants.FRAGMENT_TO_LOAD, Constants.FRAGMENT_GROUP_DETAILS)
         intent.putStringArrayListExtra("selected_members", ArrayList(selectedMembers))
         startActivity(intent)
+        activity?.finish()
+    }
+
+    private fun handleBackPress() {
+        activity?.onBackPressedDispatcher?.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                activity?.finish()
+            }
+        })
     }
 
     private fun showToast() {

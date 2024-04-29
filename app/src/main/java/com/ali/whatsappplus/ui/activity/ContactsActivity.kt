@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ali.whatsappplus.databinding.ActivityContactsBinding
@@ -38,6 +39,10 @@ class ContactsActivity : AppCompatActivity() {
         binding.newGroup.setOnClickListener {
             navigateToSelectGroupMembersActivity()
         }
+
+        binding.back.setOnClickListener {
+            finish()
+        }
     }
 
     private fun navigateToSelectGroupMembersActivity() {
@@ -63,6 +68,14 @@ class ContactsActivity : AppCompatActivity() {
 
             override fun onError(p0: CometChatException?) {
                 Log.i(TAG, "$p0")
+            }
+        })
+    }
+
+    private fun handleBackPress() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
             }
         })
     }

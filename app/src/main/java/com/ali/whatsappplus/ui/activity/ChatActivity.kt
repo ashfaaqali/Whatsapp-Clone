@@ -10,6 +10,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -149,6 +150,18 @@ class ChatActivity : AppCompatActivity() {
         binding.voiceCall.setOnClickListener {
             navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType)
         }
+
+        binding.back.setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun handleBackPress() {
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        })
     }
 
     private fun deleteSelectedMessage(messageId: Int) {
