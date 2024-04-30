@@ -107,10 +107,11 @@ class RecentChatsAdapter(
                 }
             }
 
+            // Set Last Message Timestamp
             if (message.sender == currentUser) {
-                lastMessageTime.text = formatTime(message.sentAt)
+                lastMessageTime.text = getTimestamp(message.sentAt)
             } else {
-                lastMessageTime.text = formatTime(message.deliveredToMeAt)
+                lastMessageTime.text = getTimestamp(message.deliveredToMeAt)
             }
 
             // Set unread messages count
@@ -148,9 +149,10 @@ class RecentChatsAdapter(
         }
     }
 
-    private fun formatTime(milliseconds: Long): String {
-        val sdf = SimpleDateFormat("HH:mm a", Locale.getDefault())
-        sdf.timeZone = TimeZone.getDefault()
+    // Get last message timestamp
+    private fun getTimestamp(timestamp: Long): String {
+        val milliseconds = timestamp * 1000
+        val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
         return sdf.format(Date(milliseconds))
     }
 
