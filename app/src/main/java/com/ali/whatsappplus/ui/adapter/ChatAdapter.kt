@@ -6,7 +6,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -243,6 +245,9 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         val baseMessage = messageList[position]
         val message = baseMessage as Action
         val actionMessage: TextView = viewHolder.itemView.findViewById(R.id.action_message)
+        val actionCardView: CardView = viewHolder.itemView.findViewById(R.id.action_card_view)
+
+        actionCardView.visibility = View.VISIBLE
 
         when (message.action) {
             CometChatConstants.ActionKeys.ACTION_MEMBER_ADDED -> {
@@ -299,9 +304,43 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
         val baseMessage = messageList[position]
         val mediaMessage = (baseMessage as MediaMessage)
         if (viewHolder is LeftChatImageView) {
+            // val senderName: TextView = viewHolder.itemView.findViewById(R.id.sender_name)
+            val senderProfilePic: ImageView = viewHolder.itemView.findViewById(R.id.sender_profile_pic)
+
+            if (baseMessage.receiverType == CometChatConstants.RECEIVER_TYPE_GROUP) {
+                // senderName.visibility = View.VISIBLE
+                // enderName.text = baseMessage.sender.name
+                senderProfilePic.visibility = View.VISIBLE
+
+                if (baseMessage.sender.avatar != null) {
+                    Glide.with(viewHolder.itemView)
+                        .load(baseMessage.sender.avatar)
+                        .into(senderProfilePic)
+
+                    senderProfilePic.setBackgroundResource(R.drawable.circular_bg)
+                    senderProfilePic.backgroundTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(context, color.white))
+
+                } else senderProfilePic.setImageResource(R.drawable.ic_user_profile)
+            } else {
+                // senderName.visibility = View.GONE
+                senderProfilePic.visibility = View.GONE
+
+                if (baseMessage.sender.avatar != null) {
+                    Glide.with(viewHolder.itemView)
+                        .load(baseMessage.sender.avatar)
+                        .into(viewHolder.binding.senderProfilePic)
+
+                    senderProfilePic.setBackgroundResource(R.drawable.circular_bg)
+                    senderProfilePic.backgroundTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(context, color.white))
+                } else senderProfilePic.setImageResource(R.drawable.ic_user_profile)
+            }
+
             Glide.with(context)
                 .load(mediaMessage.attachment.fileUrl)
                 .into(viewHolder.binding.leftImageMessage)
+
         } else {
             viewHolder as RightChatImageView
             Glide.with(context)
@@ -317,16 +356,83 @@ class ChatAdapter(val context: Context, baseMessages: List<BaseMessage>) :
 
         when (viewHolder) {
             is LeftChatTextViewLong -> {
-                if (baseMessage.receiverType == CometChatConstants.RECEIVER_TYPE_GROUP) {
+                val senderName: TextView = viewHolder.itemView.findViewById(R.id.sender_name)
+                val senderProfilePic: ImageView = viewHolder.itemView.findViewById(R.id.sender_profile_pic)
+                val leftMessageTextView: TextView = viewHolder.itemView.findViewById(R.id.left_message_text_view)
+                val leftMessageTimestampTextView: TextView = viewHolder.itemView.findViewById(R.id.left_chat_timestamp_txt_view)
 
+                if (baseMessage.receiverType == CometChatConstants.RECEIVER_TYPE_GROUP) {
+                    senderName.visibility = View.VISIBLE
+                    senderName.text = baseMessage.sender.name
+                    senderProfilePic.visibility = View.VISIBLE
+
+                    if (baseMessage.sender.avatar != null) {
+                        Glide.with(viewHolder.itemView)
+                            .load(baseMessage.sender.avatar)
+                            .into(senderProfilePic)
+
+                        senderProfilePic.setBackgroundResource(R.drawable.circular_bg)
+                        senderProfilePic.backgroundTintList =
+                            ColorStateList.valueOf(ContextCompat.getColor(context, color.white))
+
+                    } else senderProfilePic.setImageResource(R.drawable.ic_user_profile)
+                } else {
+                    senderName.visibility = View.GONE
+                    senderProfilePic.visibility = View.GONE
+
+                    if (baseMessage.sender.avatar != null) {
+                        Glide.with(viewHolder.itemView)
+                            .load(baseMessage.sender.avatar)
+                            .into(viewHolder.binding.senderProfilePic)
+
+                        senderProfilePic.setBackgroundResource(R.drawable.circular_bg)
+                        senderProfilePic.backgroundTintList =
+                            ColorStateList.valueOf(ContextCompat.getColor(context, color.white))
+                    } else senderProfilePic.setImageResource(R.drawable.ic_user_profile)
                 }
-                viewHolder.binding.leftMessageTextView.text = textMessage.text
-                viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+
+                leftMessageTextView.text = textMessage.text
+                leftMessageTimestampTextView.text = getTimestamp(baseMessage.sentAt)
             }
 
             is LeftChatTextViewShort -> {
-                viewHolder.binding.leftMessageTextView.text = textMessage.text
-                viewHolder.binding.leftChatTimestampTxtView.text = getTimestamp(baseMessage.sentAt)
+                val senderName: TextView = viewHolder.itemView.findViewById(R.id.sender_name)
+                val senderProfilePic: ImageView = viewHolder.itemView.findViewById(R.id.sender_profile_pic)
+                val leftMessageTextView: TextView = viewHolder.itemView.findViewById(R.id.left_message_text_view)
+                val leftMessageTimestampTextView: TextView = viewHolder.itemView.findViewById(R.id.left_chat_timestamp_txt_view)
+
+                if (baseMessage.receiverType == CometChatConstants.RECEIVER_TYPE_GROUP) {
+                    senderName.visibility = View.VISIBLE
+                    senderName.text = baseMessage.sender.name
+                    senderProfilePic.visibility = View.VISIBLE
+
+                    if (baseMessage.sender.avatar != null) {
+                        Glide.with(viewHolder.itemView)
+                            .load(baseMessage.sender.avatar)
+                            .into(senderProfilePic)
+
+                        senderProfilePic.setBackgroundResource(R.drawable.circular_bg)
+                        senderProfilePic.backgroundTintList =
+                            ColorStateList.valueOf(ContextCompat.getColor(context, color.white))
+
+                    } else senderProfilePic.setImageResource(R.drawable.ic_user_profile)
+                } else {
+                    senderName.visibility = View.GONE
+                    senderProfilePic.visibility = View.GONE
+
+                    if (baseMessage.sender.avatar != null) {
+                        Glide.with(viewHolder.itemView)
+                            .load(baseMessage.sender.avatar)
+                            .into(viewHolder.binding.senderProfilePic)
+
+                        senderProfilePic.setBackgroundResource(R.drawable.circular_bg)
+                        senderProfilePic.backgroundTintList =
+                            ColorStateList.valueOf(ContextCompat.getColor(context, color.white))
+                    } else senderProfilePic.setImageResource(R.drawable.ic_user_profile)
+                }
+
+                leftMessageTextView.text = textMessage.text
+                leftMessageTimestampTextView.text = getTimestamp(baseMessage.sentAt)
             }
 
             is RightChatTextViewLong -> {

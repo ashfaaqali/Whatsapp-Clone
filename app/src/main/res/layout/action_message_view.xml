@@ -6,9 +6,11 @@
     android:layout_marginBottom="8dp">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/action_card_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:visibility="gone"
         android:layout_margin="4dp"
         android:backgroundTint="#E6F2F8"
         app:cardCornerRadius="10dp"

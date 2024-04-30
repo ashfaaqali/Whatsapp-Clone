@@ -5,6 +5,22 @@
     android:layout_height="wrap_content">
 
     <ImageView
+        android:id="@+id/sender_profile_pic"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:src="@drawable/profile"
+        android:layout_marginStart="6dp"
+        android:visibility="gone"
+        android:paddingVertical="2dp"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/circular_bg"
+        android:backgroundTint="@color/white"
+        app:layout_constraintVertical_bias="0.05"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
         android:id="@+id/left_image_message"
         android:layout_width="150dp"
         android:layout_height="150dp"
@@ -13,10 +29,13 @@
         android:gravity="center"
         android:scaleType="centerCrop"
         android:layout_margin="4dp"
-        android:padding="4dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/sender_profile_pic"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="0"/>
 
@@ -24,6 +43,7 @@
         android:id="@+id/message_selection_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="visible"
         app:layout_constraintHeight_percent="1"
         android:background="#753595AD"
         app:layout_constraintTop_toTopOf="parent" />
