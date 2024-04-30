@@ -11,10 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.RecentChatItemBinding
 import com.bumptech.glide.Glide
+import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.models.Action
+import com.cometchat.chat.models.AppEntity
+import com.cometchat.chat.models.BaseMessage
 import com.cometchat.chat.models.Conversation
 import com.cometchat.chat.models.Group
+import com.cometchat.chat.models.MediaMessage
 import com.cometchat.chat.models.TextMessage
 import com.cometchat.chat.models.User
 import java.text.SimpleDateFormat
@@ -29,7 +33,7 @@ class RecentChatsAdapter(
     RecyclerView.Adapter<RecentChatsAdapter.MyViewHolder>() {
 
     var listener: OnChatItemClickListener? = null
-    private var TAG = "RecentChatsAdapter"
+    private val tag = "RecentChatsAdapter"
     private var currentUser = CometChat.getLoggedInUser()
 
     inner class MyViewHolder(val binding: RecentChatItemBinding) :
@@ -46,13 +50,12 @@ class RecentChatsAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val conversation = conversationList[position]
-        Log.i("RecentChatsAdapter", "Conversation: $conversation")
+        Log.i(tag, "Conversation: $conversation")
 
-        val entity = conversation.conversationWith
-        val message = conversation.lastMessage
+        val entity: AppEntity = conversation.conversationWith
+        val message: BaseMessage = conversation.lastMessage
 
         with(holder.binding) {
-
             // Check if the conversation is with User or Group
             if (entity is User) { // If entity is User
                 conversationName.text = entity.name
@@ -64,7 +67,6 @@ class RecentChatsAdapter(
                     profilePic.setImageResource(R.drawable.ic_user_profile)
                 }
 
-
             } else if (entity is Group) { // If entity is Group
                 conversationName.text = entity.name
                 if (entity.icon != null) {
@@ -74,23 +76,35 @@ class RecentChatsAdapter(
                 } else {
                     profilePic.setImageResource(R.drawable.ic_group_profile)
                     profilePic.setPadding(20, 20, 20, 20)
-                    profilePic.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
-                    profilePic.background = ContextCompat.getDrawable(context, R.drawable.circular_bg)
-                    profilePic.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_shade))
+                    profilePic.imageTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
+                    profilePic.background =
+                        ContextCompat.getDrawable(context, R.drawable.circular_bg)
+                    profilePic.backgroundTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_shade))
                 }
             }
 
             // Check message type
             if (message is TextMessage) {
-                if (message.deletedAt == 0L) {
-                    lastMessage.text = message.text
-                } else {
-                    Log.wtf(TAG, "Last message: ${message.text}")
+                if (message.deletedAt != 0L) {
                     lastMessage.text =
                         ContextCompat.getString(context, R.string.this_messages_was_deleted)
+                } else {
+                    lastMessage.text = message.text
                 }
-            } else if (message is Action){
+            } else if (message is Action) {
                 lastMessage.text = message.message
+            } else if (message is MediaMessage) {
+                if (message.type == CometChatConstants.MESSAGE_TYPE_IMAGE) {
+                    if (message.sender.uid == CometChat.getLoggedInUser().uid){
+                        val text = "You " + ContextCompat.getString(context, R.string.you_sent_image)
+                        lastMessage.text = text
+                    } else {
+                        val text = message.sender.name + " " + ContextCompat.getString(context, R.string.you_sent_image)
+                        lastMessage.text = text
+                    }
+                }
             }
 
             if (message.sender == currentUser) {

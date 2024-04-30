@@ -33,4 +33,5 @@
     <string name="members">Members:</string>
     <string name="password">Password</string>
     <string name="created_the_group">created the group</string>
+    <string name="you_sent_image">sent an image</string>
 </resources>
