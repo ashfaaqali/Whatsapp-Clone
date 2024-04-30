@@ -50,14 +50,15 @@ class RecentChatsAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val conversation = conversationList[position]
-        Log.i(tag, "Conversation: $conversation")
 
         val entity: AppEntity = conversation.conversationWith
         val message: BaseMessage = conversation.lastMessage
 
         with(holder.binding) {
-            // Check if the conversation is with User or Group
-            if (entity is User) { // If entity is User
+
+            // Set User Avatar
+            // If entity is User
+            if (entity is User) {
                 conversationName.text = entity.name
                 if (entity.avatar != null) {
                     Glide.with(holder.itemView)
@@ -66,7 +67,6 @@ class RecentChatsAdapter(
                 } else {
                     profilePic.setImageResource(R.drawable.ic_user_profile)
                 }
-
             } else if (entity is Group) { // If entity is Group
                 conversationName.text = entity.name
                 if (entity.icon != null) {
@@ -85,7 +85,7 @@ class RecentChatsAdapter(
                 }
             }
 
-            // Check message type
+            // Set Last Message Text
             if (message is TextMessage) {
                 if (message.deletedAt != 0L) {
                     lastMessage.text =
@@ -97,11 +97,15 @@ class RecentChatsAdapter(
                 lastMessage.text = message.message
             } else if (message is MediaMessage) {
                 if (message.type == CometChatConstants.MESSAGE_TYPE_IMAGE) {
-                    if (message.sender.uid == CometChat.getLoggedInUser().uid){
-                        val text = "You " + ContextCompat.getString(context, R.string.you_sent_image)
+                    if (message.sender.uid == CometChat.getLoggedInUser().uid) {
+                        val text =
+                            "You " + ContextCompat.getString(context, R.string.you_sent_image)
                         lastMessage.text = text
                     } else {
-                        val text = message.sender.name + " " + ContextCompat.getString(context, R.string.you_sent_image)
+                        val text = message.sender.name + " " + ContextCompat.getString(
+                            context,
+                            R.string.you_sent_image
+                        )
                         lastMessage.text = text
                     }
                 }
