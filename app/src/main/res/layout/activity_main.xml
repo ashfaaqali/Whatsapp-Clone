@@ -44,6 +44,10 @@
 
     </LinearLayout>
 
+    <include
+        android:id="@+id/selected_messages_toolbar"
+        layout="@layout/selected_messages_toolbar"/>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
