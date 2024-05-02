@@ -5,9 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.ali.whatsappplus.databinding.ChatItemBinding
+import com.ali.whatsappplus.Application
 import com.ali.whatsappplus.databinding.SampleLoginBottomSheetBinding
-import com.ali.whatsappplus.ui.activity.MainActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class LoginBottomSheetDialog : BottomSheetDialogFragment() {
@@ -22,24 +21,27 @@ class LoginBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val application = requireActivity().application as Application
 
         binding = SampleLoginBottomSheetBinding.inflate(layoutInflater)
 
         binding.superhero1.setOnClickListener{
-            (activity as? MainActivity)?.logoutAndLogin("superhero1")
+            application.logoutAndLogin("superhero1")
             dismiss()
         }
 
         binding.superhero2.setOnClickListener{
-            (activity as? MainActivity)?.logoutAndLogin("superhero2")
+            application.logoutAndLogin("superhero2")
             dismiss()
         }
+
         binding.superhero3.setOnClickListener{
-            (activity as? MainActivity)?.logoutAndLogin("superhero3")
+            application.logoutAndLogin("superhero3")
             dismiss()
         }
+
         binding.superhero4.setOnClickListener{
-            (activity as? MainActivity)?.logoutAndLogin("superhero4")
+            application.logoutAndLogin("superhero4")
             dismiss()
         }
 
