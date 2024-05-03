@@ -147,7 +147,6 @@ class RecentChatsAdapter(
         viewHolder.itemView.setOnLongClickListener {
             if (selectedConversation.isEmpty()) {
                 toggleConversationSelection(message)
-                Log.d(tag, "${viewHolder.itemViewType}")
             }
             notifyItemChanged(viewHolder.adapterPosition) // Refresh View To Update Selection State
             true
@@ -211,7 +210,7 @@ class RecentChatsAdapter(
             // If not selected, select the message
             selectedConversation[baseMessage.id] = baseMessage
         }
-        selectedConversationLiveData.value = selectedConversation.keys.toList()
+        selectedConversationLiveData.postValue(selectedConversation.keys.toList())
     }
 
 

@@ -4,10 +4,14 @@ package com.ali.whatsappplus.ui.fragment
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.FragmentRecentChatsBinding
 import com.ali.whatsappplus.ui.activity.ChatActivity
 import com.ali.whatsappplus.ui.activity.MainActivity
@@ -33,13 +37,18 @@ class RecentChatsFragment : Fragment() {
     private val tag = "RecentChatsFragment"
     private var selectedConversations: List<Int> = emptyList()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentRecentChatsBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel = ViewModelProvider(this)[RecentChatsViewModel::class.java]
         recyclerViewSetup()
-
-        val activity = activity as MainActivity
-        activity.findViewById<>()
 
         // Handling Item Click
         adapter.listener = object : RecentChatsAdapter.OnChatItemClickListener {
@@ -69,15 +78,16 @@ class RecentChatsFragment : Fragment() {
         binding.recentChatsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    private fun toggleToolbar(selectedMessages: List<Int>) {
-        if (selectedMessages.isNotEmpty()) { // Messages Are Selected
-            binding.toolbar.visibility = View.GONE
-            binding.selectedMessagesToolbar.toolbar.visibility = View.VISIBLE
-            binding.selectedMessagesToolbar.selectedMessagesCount.text =
-                selectedMessages.size.toString()
-        } else { // Messages Are Not Selected
-            binding.toolbar.visibility = View.VISIBLE
-            binding.selectedMessagesToolbar.toolbar.visibility = View.GONE
+    private fun toggleToolbar(selectedConversations: List<Int>) {
+        val activity = activity as MainActivity
+        val selectConvToolbar = activity.findViewById<LinearLayout>(R.id.select_conv_toolbar)
+        val whatsappToolbar = activity.findViewById<LinearLayout>(R.id.whatsapp_toolbar)
+        if (selectedConversations.isNotEmpty()){
+            selectConvToolbar.visibility = View.VISIBLE
+            whatsappToolbar.visibility = View.GONE
+        } else {
+            selectConvToolbar.visibility = View.GONE
+            whatsappToolbar.visibility = View.VISIBLE
         }
     }
 
@@ -162,5 +172,4 @@ class RecentChatsFragment : Fragment() {
         intent.putExtra("receiverType", receiverType)
         startActivity(intent)
     }
-
 }

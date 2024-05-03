@@ -8,52 +8,142 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="14dp"
-        android:gravity="center_vertical"
-        android:background="?attr/colorPrimary">
-
-        <com.google.android.material.textview.MaterialTextView
-            android:layout_width="0dp"
-            android:layout_weight="0.6"
+        android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/whatsapp_toolbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/whatsapp"
-            android:textSize="22sp"
-            android:textColor="@color/white" />
+            android:orientation="horizontal"
+            android:padding="14dp"
+            android:gravity="center_vertical"
+            android:background="?attr/colorPrimary">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="wrap_content"
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="0dp"
+                android:layout_weight="0.6"
+                android:layout_height="wrap_content"
+                android:text="@string/whatsapp"
+                android:textSize="22sp"
+                android:textColor="@color/white" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:src="@drawable/ic_camera_outlined"
+                app:tint="@color/white"/>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="10dp"
+                android:src="@drawable/ic_search"
+                app:tint="@color/white"/>
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_options"
+                app:tint="@color/white"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/select_conv_toolbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="10dp"
-            android:src="@drawable/ic_camera_outlined"
-            app:tint="@color/white"/>
+            android:background="?attr/colorPrimary"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:translationZ="1dp"
+            android:orientation="horizontal"
+            android:paddingVertical="8dp">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="10dp"
-            android:src="@drawable/ic_search"
-            app:tint="@color/white"/>
+            <ImageView
+                android:id="@+id/back"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:contentDescription="@string/back"
+                android:padding="8dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/white" />
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/options"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_options"
-            app:tint="@color/white"/>
+            <TextView
+                android:id="@+id/selected_messages_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:text="2"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
 
+            <ImageView
+                android:id="@+id/img_reply"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:contentDescription="@string/search"
+                android:padding="8dp"
+                android:src="@drawable/ic_pin"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:id="@+id/img_star"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:contentDescription="@string/search"
+                android:padding="8dp"
+                android:src="@drawable/ic_delete"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:id="@+id/img_delete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_weight=".5"
+                android:contentDescription="@string/search"
+                android:padding="8dp"
+                android:src="@drawable/ic_notification_off"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:id="@+id/img_forward"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:contentDescription="@string/options"
+                android:padding="8dp"
+                android:src="@drawable/ic_archive"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:id="@+id/img_options"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:contentDescription="@string/options"
+                android:padding="8dp"
+                android:src="@drawable/ic_options"
+                app:tint="@color/white" />
+        </LinearLayout>
     </LinearLayout>
 
-    <include
-        android:id="@+id/selected_messages_toolbar"
-        layout="@layout/selected_messages_toolbar"/>
+
+<!--    <include-->
+<!--        android:id="@+id/include_selected_conv_toolbar"-->
+<!--        layout="@layout/conversation_select_toolbar"-->
+<!--        android:visibility="gone"/>-->
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar"
         app:tabTextColor="#9EE4DC"
+        android:layout_below="@id/toolbar"
         app:tabSelectedTextColor="@color/white"
         app:tabMode="fixed"
         app:tabGravity="fill"
