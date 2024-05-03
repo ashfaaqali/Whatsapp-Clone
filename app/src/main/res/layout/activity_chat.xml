@@ -153,6 +153,7 @@
                 android:id="@+id/attachment_btn"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
+                android:rotation="90"
                 android:layout_weight="0.15"
                 android:contentDescription="@string/attachment"
                 android:padding="12dp"
