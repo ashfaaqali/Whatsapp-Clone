@@ -1,7 +1,9 @@
 package com.ali.whatsappplus
 
 import android.app.Application
+import android.content.Intent
 import android.util.Log
+import com.ali.whatsappplus.ui.activity.MainActivity
 import com.ali.whatsappplus.util.Constants
 import com.cometchat.calls.core.CallAppSettings
 import com.cometchat.calls.core.CometChatCalls
@@ -36,7 +38,10 @@ class Application : Application() {
                 }
 
                 override fun onError(p0: com.cometchat.calls.exceptions.CometChatException?) {
-                    Log.d(TAG, "CometChatCalls initialization failed with exception: " + p0?.message)
+                    Log.d(
+                        TAG,
+                        "CometChatCalls initialization failed with exception: " + p0?.message
+                    )
                 }
             }
         )
@@ -89,6 +94,9 @@ class Application : Application() {
             override fun onSuccess(p0: String?) {
                 Log.d(TAG, "Logout Successful $p0")
                 loginUser(uid)
+                val intent = Intent(applicationContext, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
             }
 
             override fun onError(p0: CometChatException?) {
