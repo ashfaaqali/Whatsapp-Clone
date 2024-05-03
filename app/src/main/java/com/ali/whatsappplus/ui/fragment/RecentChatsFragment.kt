@@ -18,6 +18,7 @@ import com.ali.whatsappplus.databinding.FragmentRecentChatsBinding
 import com.ali.whatsappplus.ui.activity.ChatActivity
 import com.ali.whatsappplus.ui.activity.MainActivity
 import com.ali.whatsappplus.ui.adapter.RecentChatsAdapter
+import com.ali.whatsappplus.util.Constants
 import com.ali.whatsappplus.viewmodel.RecentChatsViewModel
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.ConversationsRequest
@@ -170,10 +171,10 @@ class RecentChatsFragment : Fragment() {
         receiverType: String
     ) {
         val intent = Intent(requireContext(), ChatActivity::class.java)
-        intent.putExtra("name", name)
-        intent.putExtra("receiverId", uid)
-        intent.putExtra("avatar", avatar)
-        intent.putExtra("receiverType", receiverType)
+        intent.putExtra(Constants.USER_NAME, name)
+        intent.putExtra(Constants.RECEIVER_ID, uid)
+        intent.putExtra(Constants.AVATAR, avatar)
+        intent.putExtra(Constants.RECEIVER_TYPE, receiverType)
         startActivity(intent)
     }
 }

@@ -1,7 +1,6 @@
 package com.ali.whatsappplus.ui.fragment
 
-// VOICE AND VIDEO CALLS
-
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,15 +9,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ali.whatsappplus.databinding.FragmentCallsBinding
+import com.ali.whatsappplus.ui.activity.CallDetailsActivity
 import com.ali.whatsappplus.ui.adapter.CallLogAdapter
-import com.ali.whatsappplus.ui.adapter.RecentChatsAdapter
+import com.ali.whatsappplus.util.Constants
 import com.cometchat.calls.constants.CometChatCallsConstants
 import com.cometchat.calls.core.CallLogRequest.CallLogRequestBuilder
 import com.cometchat.calls.core.CometChatCalls
 import com.cometchat.calls.exceptions.CometChatException
 import com.cometchat.calls.model.CallLog
 import com.cometchat.chat.core.CometChat
-
 
 class CallLogFragment : Fragment() {
     private val TAG = "CallLogFragment"
@@ -34,6 +33,31 @@ class CallLogFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerViewSetup()
+        adapter.onCallLogItemClick = object : CallLogAdapter.OnCallLogItemClick {
+            override fun onCallLogItemClickListener(
+                name: String,
+                receiverUid: String,
+                avatar: String,
+                receiverType: String
+            ) {
+                navigateToCallLogDetailsActivity(name, receiverUid, avatar, receiverType)
+            }
+
+        }
+    }
+
+    private fun navigateToCallLogDetailsActivity(
+        name: String,
+        receiverUid: String,
+        avatar: String,
+        receiverType: String
+    ) {
+        val intent = Intent(requireContext(), CallDetailsActivity::class.java)
+        intent.putExtra(Constants.USER_NAME, name)
+        intent.putExtra(Constants.RECEIVER_ID, receiverUid)
+        intent.putExtra(Constants.AVATAR, avatar)
+        intent.putExtra(Constants.RECEIVER_TYPE, receiverType)
+        startActivity(intent)
     }
 
     private fun fetchCallLogs() {

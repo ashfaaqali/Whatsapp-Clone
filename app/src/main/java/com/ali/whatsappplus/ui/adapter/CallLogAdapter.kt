@@ -2,9 +2,9 @@ package com.ali.whatsappplus.ui.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -19,7 +19,9 @@ import com.cometchat.calls.model.CallUser
 
 class CallLogAdapter(val context: Context, private var callLogList: List<CallLog>) :
     RecyclerView.Adapter<ViewHolder>() {
-    private val tag = "CallLogAdapter"
+
+    private val TAG = "CallLogAdapter"
+    var onCallLogItemClick: OnCallLogItemClick? = null
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -36,7 +38,8 @@ class CallLogAdapter(val context: Context, private var callLogList: List<CallLog
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val callLog = callLogList[position]
-        val entity = callLog.initiator
+        val initiator = callLog.initiator
+        val receiver = callLog.receiver
 
         // Item Views
         val profilePicture: ImageView = viewHolder.itemView.findViewById(R.id.profile_pic)
@@ -46,22 +49,22 @@ class CallLogAdapter(val context: Context, private var callLogList: List<CallLog
         val callTime: TextView = viewHolder.itemView.findViewById(R.id.call_time)
         val callBtn: ImageView = viewHolder.itemView.findViewById(R.id.call_btn)
 
-        if (entity is CallUser) {
-            callerName.text = entity.name
-            if (entity.avatar != null) {
+        if (initiator is CallUser) {
+            callerName.text = initiator.name
+            if (initiator.avatar != null) {
                 Glide.with(viewHolder.itemView)
-                    .load(entity.avatar)
+                    .load(initiator.avatar)
                     .into(profilePicture)
             } else {
                 profilePicture.setImageResource(R.drawable.ic_user_profile)
             }
         }
 
-        if (entity is CallGroup) {
-            callerName.text = entity.name
-            if (entity.icon != null) {
+        if (initiator is CallGroup) {
+            callerName.text = initiator.name
+            if (initiator.icon != null) {
                 Glide.with(viewHolder.itemView)
-                    .load(entity.icon)
+                    .load(initiator.icon)
                     .into(profilePicture)
             } else {
                 profilePicture.setImageResource(R.drawable.ic_group_profile)
@@ -75,6 +78,15 @@ class CallLogAdapter(val context: Context, private var callLogList: List<CallLog
             }
         }
 
+        viewHolder.itemView.setOnClickListener {
+            if (initiator is CallUser) {
+                onCallLogItemClick?.onCallLogItemClickListener(initiator.name, initiator.uid, initiator.avatar, callLog.receiverType)
+                Log.d(TAG, "Name: ${initiator.name}")
+            }
+            if (initiator is CallGroup) {
+                onCallLogItemClick?.onCallLogItemClickListener(initiator.name, initiator.guid, initiator.icon, callLog.receiverType)
+            }
+        }
     }
 
     fun setData(callLogList: List<CallLog>) {
@@ -84,5 +96,14 @@ class CallLogAdapter(val context: Context, private var callLogList: List<CallLog
 
     inner class MyViewHolder(val binding: CallLogItemBinding) :
         ViewHolder(binding.root)
+
+    interface OnCallLogItemClick{
+        fun onCallLogItemClickListener(
+            name: String,
+            receiverUid: String,
+            avatar: String,
+            receiverType: String
+        )
+    }
 
 }

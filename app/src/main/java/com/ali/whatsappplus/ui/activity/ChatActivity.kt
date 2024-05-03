@@ -433,11 +433,11 @@ class ChatActivity : AppCompatActivity() {
 
     private fun handleIntentData() {
         if (intent != null) {
-            userName = intent.getStringExtra("name").toString()
-            userAvatar = intent.getStringExtra("avatar")
+            userName = intent.getStringExtra(Constants.USER_NAME).toString()
+            userAvatar = intent.getStringExtra(Constants.AVATAR)
             Log.i(TAG, "userAvatar: $userAvatar")
-            receiverId = intent.getStringExtra("receiverId").toString()
-            receiverType = intent.getStringExtra("receiverType").toString()
+            receiverId = intent.getStringExtra(Constants.RECEIVER_ID).toString()
+            receiverType = intent.getStringExtra(Constants.RECEIVER_TYPE).toString()
         } else {
             Toast.makeText(applicationContext, "Error Loading Data", Toast.LENGTH_SHORT).show()
         }
@@ -486,7 +486,7 @@ class ChatActivity : AppCompatActivity() {
                 .load(userAvatar)
                 .into(binding.profilePic)
         } else {
-            if (receiverType == "user") binding.profilePic.setImageResource(R.drawable.ic_user_profile)
+            if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) binding.profilePic.setImageResource(R.drawable.ic_user_profile)
             else {
                 binding.profilePic.setImageResource(R.drawable.ic_group_profile)
                 binding.profilePic.setPadding(20, 20, 20, 20)
@@ -505,10 +505,10 @@ class ChatActivity : AppCompatActivity() {
         receiverType: String
     ) {
         val intent = Intent(this, VoiceCall::class.java)
-        intent.putExtra("name", name)
-        intent.putExtra("receiverId", uid)
-        intent.putExtra("avatar", avatar)
-        intent.putExtra("receiverType", receiverType)
+        intent.putExtra(Constants.USER_NAME, name)
+        intent.putExtra(Constants.RECEIVER_ID, uid)
+        intent.putExtra(Constants.AVATAR, avatar)
+        intent.putExtra(Constants.RECEIVER_TYPE, receiverType)
         startActivity(intent)
     }
 }

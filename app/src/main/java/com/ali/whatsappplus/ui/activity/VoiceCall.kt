@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityVoiceCallBinding
+import com.ali.whatsappplus.util.Constants
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.Call
@@ -110,10 +111,10 @@ class VoiceCall : AppCompatActivity() {
 
     private fun handleIntentData() {
         if (intent != null) {
-            userName = intent.getStringExtra("name").toString()
-            userAvatar = intent.getStringExtra("avatar").toString()
-            receiverId = intent.getStringExtra("receiverId").toString()
-            receiverType = intent.getStringExtra("receiverType").toString()
+            userName = intent.getStringExtra(Constants.USER_NAME).toString()
+            userAvatar = intent.getStringExtra(Constants.AVATAR).toString()
+            receiverId = intent.getStringExtra(Constants.RECEIVER_ID).toString()
+            receiverType = intent.getStringExtra(Constants.RECEIVER_TYPE).toString()
         } else {
             Toast.makeText(applicationContext, "Error Loading Data", Toast.LENGTH_SHORT).show()
         }

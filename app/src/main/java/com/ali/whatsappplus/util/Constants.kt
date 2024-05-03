@@ -6,6 +6,10 @@ object Constants {
     const val AUTH_KEY = "032076726b4ef66929857fb28e019d5dc8f00436"
     const val LOGIN_BOTTOM_SHEET_TAG = "LOGIN_BOTTOM_SHEET_DIALOG"
     const val ATTACHMENTS_BOTTOM_SHEET_TAG = "ATTACHMENTS_BOTTOM_SHEET_DIALOG"
+    const val USER_NAME = "username"
+    const val RECEIVER_ID = "receiverId"
+    const val RECEIVER_TYPE = "receiverType"
+    const val AVATAR = "avatar"
     const val PICK_IMAGE_REQUEST = 0
     const val LEFT_CHAT_TEXT_VIEW_SHORT = 111
     const val LEFT_CHAT_TEXT_VIEW_LONG = 102
