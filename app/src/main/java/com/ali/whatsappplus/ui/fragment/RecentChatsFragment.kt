@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,9 +81,10 @@ class RecentChatsFragment : Fragment() {
     }
 
     private fun toggleToolbar(selectedConversations: List<Int>) {
-        val activity = activity as MainActivity
-        val selectConvToolbar = activity.findViewById<LinearLayout>(R.id.select_conv_toolbar)
-        val whatsappToolbar = activity.findViewById<LinearLayout>(R.id.whatsapp_toolbar)
+        val activity: MainActivity = activity as MainActivity
+        val selectConvToolbar: LinearLayout = activity.findViewById(R.id.select_conv_toolbar)
+        val whatsappToolbar: LinearLayout = activity.findViewById(R.id.whatsapp_toolbar)
+        val selectConvCountTxtView: TextView = activity.findViewById(R.id.selected_conv_count)
         if (selectedConversations.isNotEmpty()){
             selectConvToolbar.visibility = View.VISIBLE
             whatsappToolbar.visibility = View.GONE
@@ -89,6 +92,7 @@ class RecentChatsFragment : Fragment() {
             selectConvToolbar.visibility = View.GONE
             whatsappToolbar.visibility = View.VISIBLE
         }
+        selectConvCountTxtView.text = selectedConversations.size.toString()
     }
 
     private fun fetchConversation() {

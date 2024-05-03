@@ -71,7 +71,7 @@
                 app:tint="@color/white" />
 
             <TextView
-                android:id="@+id/selected_messages_count"
+                android:id="@+id/selected_conv_count"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.5"
@@ -80,7 +80,7 @@
                 android:textSize="18sp" />
 
             <ImageView
-                android:id="@+id/img_reply"
+                android:id="@+id/img_pin"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
@@ -90,7 +90,7 @@
                 app:tint="@color/white" />
 
             <ImageView
-                android:id="@+id/img_star"
+                android:id="@+id/img_delete"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
@@ -100,7 +100,7 @@
                 app:tint="@color/white" />
 
             <ImageView
-                android:id="@+id/img_delete"
+                android:id="@+id/img_notification_off"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="3dp"
@@ -111,7 +111,7 @@
                 app:tint="@color/white" />
 
             <ImageView
-                android:id="@+id/img_forward"
+                android:id="@+id/img_archive"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
