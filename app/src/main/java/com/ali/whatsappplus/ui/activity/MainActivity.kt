@@ -3,6 +3,7 @@ package com.ali.whatsappplus.ui.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityMainBinding
@@ -39,6 +40,18 @@ class MainActivity : AppCompatActivity() {
         binding.options.setOnClickListener {
             showLoginBottomSheet()
         }
+
+        binding.icCamera.setOnClickListener {
+            showToast("Camera")
+        }
+
+        binding.search.setOnClickListener {
+            showToast("Search")
+        }
+    }
+
+    private fun showToast(text: String) {
+        Toast.makeText(applicationContext, text, Toast.LENGTH_SHORT).show()
     }
 
     private fun showLoginBottomSheet() {
