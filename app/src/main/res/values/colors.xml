@@ -7,6 +7,8 @@
     <color name="right_message_color">#D1FFD4</color>
     <color name="left_message_color">#F3F0F0</color>
 
+    <color name="dark">#1C1C1C</color>
+
     <color name="light_grey">#D0CACA</color>
     <color name="blue">#03D9FF</color>
     <color name="transparent_blue">#00D9FF</color>

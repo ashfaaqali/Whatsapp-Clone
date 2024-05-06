@@ -1,5 +1,6 @@
 package com.ali.whatsappplus
 
+import android.app.Activity
 import android.app.Application
 import android.content.Intent
 import android.util.Log
@@ -14,15 +15,17 @@ import com.cometchat.chat.models.User
 
 class Application : Application() {
     private val TAG = "Application"
+    private lateinit var currentActivity: Activity
 
     override fun onCreate() {
         super.onCreate()
-        //CometChat Initialization, Login
-        cometChatInit()
-        cometChatCallsInit()
-        loginUser("superhero1")
+
+        cometChatInit() // CometChat initialization
+        cometChatCallsInit() // CometChatCalls initialization
+        loginUser("superhero1") // CometChat login
     }
 
+    // Initialize CometChat Calls
     private fun cometChatCallsInit() {
         val callAppSettings = CallAppSettings.CallAppSettingBuilder()
             .setAppId(Constants.APP_ID)
@@ -47,6 +50,7 @@ class Application : Application() {
         )
     }
 
+    // CometChat user login
     private fun loginUser(uid: String) {
         CometChat.login(
             uid,
@@ -64,6 +68,17 @@ class Application : Application() {
         )
     }
 
+    // Function to set current activity
+    fun setCurrentActivity(activity: Activity) {
+        currentActivity = activity
+    }
+
+    // Function to finish current activity
+    fun finishCurrentActivity() {
+        currentActivity.finish()
+    }
+
+    // Initialize CometChat (Must before calling any CometChat method)
     private fun cometChatInit() {
         val appSetting: AppSettings = AppSettings.AppSettingsBuilder()
             .setRegion(Constants.REGION)
@@ -97,6 +112,7 @@ class Application : Application() {
                 val intent = Intent(applicationContext, MainActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
+                finishCurrentActivity()
             }
 
             override fun onError(p0: CometChatException?) {

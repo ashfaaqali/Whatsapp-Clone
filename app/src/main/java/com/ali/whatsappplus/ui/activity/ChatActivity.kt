@@ -148,7 +148,7 @@ class ChatActivity : AppCompatActivity() {
 
         // Initiate Voice Call
         binding.voiceCall.setOnClickListener {
-            navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType)
+            navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType, true)
         }
 
         binding.back.setOnClickListener {
@@ -494,7 +494,6 @@ class ChatActivity : AppCompatActivity() {
                 binding.profilePic.background = ContextCompat.getDrawable(this, R.drawable.circular_bg)
                 binding.profilePic.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_shade))
             }
-
         }
     }
 
@@ -502,13 +501,15 @@ class ChatActivity : AppCompatActivity() {
         name: String,
         uid: String,
         avatar: String?,
-        receiverType: String
+        receiverType: String,
+        initiatedByUser: Boolean
     ) {
         val intent = Intent(this, VoiceCall::class.java)
         intent.putExtra(Constants.USER_NAME, name)
         intent.putExtra(Constants.RECEIVER_ID, uid)
         intent.putExtra(Constants.AVATAR, avatar)
         intent.putExtra(Constants.RECEIVER_TYPE, receiverType)
+        intent.putExtra(Constants.INITIATED_BY_USER, initiatedByUser)
         startActivity(intent)
     }
 }

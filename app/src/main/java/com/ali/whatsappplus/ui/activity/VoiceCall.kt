@@ -10,8 +10,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityVoiceCallBinding
+import com.ali.whatsappplus.ui.fragment.call.IncomingCallFragment
+import com.ali.whatsappplus.ui.fragment.call.OutgoingCallFragment
 import com.ali.whatsappplus.util.Constants
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
@@ -20,101 +23,58 @@ import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.exceptions.CometChatException
 
 class VoiceCall : AppCompatActivity() {
-    private lateinit var binding: ActivityVoiceCallBinding
-    private var receiverId = ""
-    private var receiverType = ""
-    private var userName = ""
-    private var userAvatar = ""
 
+    private lateinit var binding: ActivityVoiceCallBinding
+    private var receiverId: String? = null
+    private var receiverType: String? = null
+    private var userName: String? = null
+    private var userAvatar: String? = null
+    private var initiatedByUser: Boolean = false
     private var TAG = "VoiceCallActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityVoiceCallBinding.inflate(layoutInflater)
-        statusBarTransparent() // Set transparent status bar for call screen
         setContentView(binding.root)
+        handleIntentData() // Get intent data
 
-        handleIntentData()
-        setDataToViews()
-        initiateVoiceCall()
+        if (initiatedByUser){ // Show the OutgoingCallFragment to the INITIATOR
+            val args = Bundle()
+            args.putString(Constants.USER_NAME, userName)
+            args.putString(Constants.AVATAR, userAvatar)
+            args.putString(Constants.RECEIVER_ID, receiverId)
+            args.putString(Constants.RECEIVER_TYPE, receiverType)
+            startFragment(OutgoingCallFragment(), args) // Show the fragment
+        } else { // Show the IncomingCallFragment to the RECEIVER
+            val args = Bundle()
+            args.putString(Constants.USER_NAME, userName)
+            args.putString(Constants.AVATAR, userAvatar)
+            args.putString(Constants.RECEIVER_ID, receiverId)
+            args.putString(Constants.RECEIVER_TYPE, receiverType)
+            startFragment(IncomingCallFragment(), args) // Show the fragment
+        }
     }
 
-    private fun statusBarTransparent() {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-        window.statusBarColor = android.graphics.Color.TRANSPARENT
+    // Show fragment
+    private fun startFragment(fragment: Fragment, args: Bundle? = null) {
+        if (args != null) {
+            fragment.arguments = args
+            supportFragmentManager.beginTransaction().replace(R.id.frame_Layout, fragment)
+                .commit()
+        } else {
+            supportFragmentManager.beginTransaction().replace(R.id.frame_Layout, fragment)
+                .commit()
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        callListener() // Listener for incoming, outgoing, call accept, call reject.
-    }
-
-    private fun callListener() {
-        CometChat.addCallListener(TAG, object : CometChat.CallListener() {
-            override fun onOutgoingCallAccepted(p0: Call?) {
-                Log.d(TAG, "Outgoing call accepted: " + p0?.toString())
-            }
-
-            override fun onIncomingCallReceived(p0: Call?) {
-                Log.d(TAG, "Incoming call: " + p0?.toString())
-            }
-
-            override fun onIncomingCallCancelled(p0: Call?) {
-                Log.d(TAG, "Incoming call cancelled: " + p0?.toString())
-            }
-
-            override fun onOutgoingCallRejected(p0: Call?) {
-                Log.d(TAG, "Outgoing call rejected: " + p0?.toString())
-            }
-
-            override fun onCallEndedMessageReceived(p0: Call?) {
-                Log.d(TAG, "End call message received: " + p0?.toString())
-            }
-
-        })
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // Remove call listener when not in use.
-        CometChat.removeCallListener(TAG)
-    }
-
-    private fun setDataToViews() {
-        binding.contactName.text = userName
-        Glide.with(this)
-            .load(userAvatar)
-            .into(binding.avatar)
-    }
-
-    private fun initiateVoiceCall() {
-        // Check Receiver type and create Call Object
-        val call = if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) Call(
-            receiverId,
-            CometChatConstants.RECEIVER_TYPE_USER,
-            CometChatConstants.CALL_TYPE_AUDIO
-        ) else Call(
-            receiverId,
-            CometChatConstants.RECEIVER_TYPE_GROUP,
-            CometChatConstants.CALL_TYPE_AUDIO
-        )
-
-        CometChat.initiateCall(call, object : CometChat.CallbackListener<Call>() {
-            override fun onSuccess(call: Call) {
-                Log.d(TAG, "Call initiated successfully: $call")
-            }
-
-            override fun onError(e: CometChatException) {
-                Log.d(TAG, "Call initialization failed with exception: " + e.message)
-            }
-        })
-    }
-
+    // Get intent data
     private fun handleIntentData() {
         if (intent != null) {
-            userName = intent.getStringExtra(Constants.USER_NAME).toString()
-            userAvatar = intent.getStringExtra(Constants.AVATAR).toString()
-            receiverId = intent.getStringExtra(Constants.RECEIVER_ID).toString()
-            receiverType = intent.getStringExtra(Constants.RECEIVER_TYPE).toString()
+            userName = intent.getStringExtra(Constants.USER_NAME)
+            userAvatar = intent.getStringExtra(Constants.AVATAR)
+            receiverId = intent.getStringExtra(Constants.RECEIVER_ID)
+            receiverType = intent.getStringExtra(Constants.RECEIVER_TYPE)
+            initiatedByUser = intent.getBooleanExtra(Constants.INITIATED_BY_USER, false)
         } else {
             Toast.makeText(applicationContext, "Error Loading Data", Toast.LENGTH_SHORT).show()
         }
