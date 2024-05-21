@@ -148,7 +148,11 @@ class ChatActivity : AppCompatActivity() {
 
         // Initiate Voice Call
         binding.voiceCall.setOnClickListener {
-            navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType, true)
+            navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType, Constants.OUTGOING_CALL_FRAGMENT)
+        }
+
+        binding.videoCall.setOnClickListener {
+            navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType, Constants.PRESENTER_FRAGMENT)
         }
 
         binding.back.setOnClickListener {
@@ -502,14 +506,14 @@ class ChatActivity : AppCompatActivity() {
         uid: String,
         avatar: String?,
         receiverType: String,
-        initiatedByUser: Boolean
+        fragmentToLoad: String
     ) {
         val intent = Intent(this, VoiceCall::class.java)
         intent.putExtra(Constants.USER_NAME, name)
         intent.putExtra(Constants.RECEIVER_ID, uid)
         intent.putExtra(Constants.AVATAR, avatar)
         intent.putExtra(Constants.RECEIVER_TYPE, receiverType)
-        intent.putExtra(Constants.INITIATED_BY_USER, initiatedByUser)
+        intent.putExtra(Constants.FRAGMENT_TO_LOAD, fragmentToLoad)
         startActivity(intent)
     }
 }

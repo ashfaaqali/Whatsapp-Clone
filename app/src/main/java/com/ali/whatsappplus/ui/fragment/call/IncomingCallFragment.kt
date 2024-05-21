@@ -20,6 +20,7 @@ class IncomingCallFragment : Fragment() {
     private var receiverType: String? = null
     private var userName: String? = null
     private var userAvatar: String? = null
+    private var isPresenter: Boolean = false
     private val listenerId = "call_listener"
     private val TAG = "IncomingCallFragment"
 
@@ -69,6 +70,7 @@ class IncomingCallFragment : Fragment() {
             userAvatar = requireArguments().getString(Constants.AVATAR)
             receiverId = requireArguments().getString(Constants.RECEIVER_ID)
             receiverType = requireArguments().getString(Constants.RECEIVER_TYPE)
+            isPresenter = requireArguments().getBoolean(Constants.IS_PRESENTER)
         } else {
             Toast.makeText(requireContext(), "Error Loading Data", Toast.LENGTH_SHORT).show()
         }
