@@ -150,7 +150,6 @@
         app:tabMode="fixed"
         app:tabGravity="fill"
         app:tabIndicatorFullWidth="true"
-        android:elevation="5dp"
         app:tabIndicatorColor="@color/white"
         android:background="?attr/colorPrimary"/>
 
