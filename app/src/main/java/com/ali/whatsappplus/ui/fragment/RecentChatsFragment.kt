@@ -35,7 +35,7 @@ class RecentChatsFragment : Fragment() {
     private lateinit var binding: FragmentRecentChatsBinding
     private lateinit var viewModel: RecentChatsViewModel
     private lateinit var adapter: RecentChatsAdapter
-    private lateinit var sortedConversationList: List<Conversation>
+    private var conversationList: MutableList<Conversation> = mutableListOf()
     private lateinit var conversationsRequest: ConversationsRequest
     private val tag = "RecentChatsFragment"
     private var selectedConversations: List<Int> = emptyList()
@@ -73,6 +73,7 @@ class RecentChatsFragment : Fragment() {
 
         // Real-Time Message Listener
         messageListener()
+        fetchConversation()
     }
 
     private fun recyclerViewSetup() {
@@ -97,19 +98,23 @@ class RecentChatsFragment : Fragment() {
     }
 
     private fun fetchConversation() {
+        binding.shimmer.visibility = View.VISIBLE
+        binding.recentChatsRecyclerView.visibility = View.GONE
+        binding.shimmer.startShimmer()
+
         conversationsRequest = ConversationsRequestBuilder()
             .setLimit(20)
             .build()
 
         conversationsRequest.fetchNext(object : CometChat.CallbackListener<List<Conversation>>() {
-            override fun onSuccess(conversationList: List<Conversation>?) {
+            override fun onSuccess(list: List<Conversation>?) {
                 //Handle List of Conversations
-                if (conversationList != null) {
+                if (list != null) {
                     stopShimmer()
-                    Log.i(tag, " Conversation List: $conversationList")
-                    sortedConversationList =
-                        conversationList.sortedWith(compareByDescending { it.lastMessage.sentAt })
-                    adapter.setData(sortedConversationList)
+                    Log.i(tag, "Conversation List: $conversationList")
+                    conversationList.clear()
+                    conversationList.addAll(list)
+                    adapter.setData(conversationList)
                 }
             }
 
@@ -123,6 +128,7 @@ class RecentChatsFragment : Fragment() {
     private fun stopShimmer() {
         binding.shimmer.stopShimmer()
         binding.shimmer.visibility = View.GONE
+        binding.recentChatsRecyclerView.visibility = View.VISIBLE
     }
 
     private fun messageListener() {
@@ -133,18 +139,18 @@ class RecentChatsFragment : Fragment() {
                 // Get the conversation associated with the received message
                 val conversation = CometChatHelper.getConversationFromMessage(textMessage)
                 // Update the conversation list with the new/updated conversation
-                val updatedList = sortedConversationList.toMutableList()
-                val existingIndex =
-                    updatedList.indexOfFirst { it.conversationId == conversation.conversationId }
+                val existingIndex = conversationList.indexOfFirst { it.conversationId == conversation.conversationId }
+
                 if (existingIndex != -1) {
-                    updatedList[existingIndex] = conversation // Update existing conversation
-                } else {
-                    updatedList.add(conversation) // Add new conversation
+                    // Remove the existing conversation
+                    conversationList.removeAt(existingIndex)
                 }
-                // Sort the conversation list based on the latest message time
-                sortedConversationList = updatedList.sortedByDescending { it.lastMessage.sentAt }
-                // Update the adapter with the sorted conversation list
-                adapter.setData(sortedConversationList)
+
+                // Add the conversation to the top of the list
+                conversationList.add(0, conversation)
+
+                // Update the adapter with the new list
+                adapter.setData(conversationList)
             }
 
             override fun onMediaMessageReceived(mediaMessage: MediaMessage) {
@@ -160,8 +166,6 @@ class RecentChatsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // Fetch Conversations
-        fetchConversation()
-        binding.shimmer.startShimmer()
     }
 
     private fun navigateToChatActivity(

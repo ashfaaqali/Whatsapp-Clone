@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -91,8 +93,9 @@ class VoiceCall : AppCompatActivity() {
         // Inflate the custom view
         val dialogView = layoutInflater.inflate(R.layout.progress_bar, null)
 
-        // Find the views in the custom layout
-        // val progressBar: ProgressBar = dialogView.findViewById(R.id.progress_bar)
+         // Find the views in the custom layout
+         val textView: TextView = dialogView.findViewById(R.id.text)
+        textView.text = "Presenting..."
 
         // Create the AlertDialog
         dialog = AlertDialog.Builder(this)

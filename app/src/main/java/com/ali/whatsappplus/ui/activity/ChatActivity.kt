@@ -9,10 +9,13 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -112,8 +115,6 @@ class ChatActivity : AppCompatActivity() {
         handleIntentData()
         setUserData()
         setupRecyclerView()
-        // fetchMissedMessages()
-        // fetchUnreadMessages()
         fetchMessage()
 
         binding.messageEditText.addTextChangedListener(mTextEditorWatcher)
@@ -148,11 +149,23 @@ class ChatActivity : AppCompatActivity() {
 
         // Initiate Voice Call
         binding.voiceCall.setOnClickListener {
-            navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType, Constants.OUTGOING_CALL_FRAGMENT)
+            navigateToVoiceCallActivity(
+                userName,
+                receiverId,
+                userAvatar,
+                receiverType,
+                Constants.OUTGOING_CALL_FRAGMENT
+            )
         }
 
         binding.videoCall.setOnClickListener {
-            navigateToVoiceCallActivity(userName, receiverId, userAvatar, receiverType, Constants.PRESENTER_FRAGMENT)
+            navigateToVoiceCallActivity(
+                userName,
+                receiverId,
+                userAvatar,
+                receiverType,
+                Constants.PRESENTER_FRAGMENT
+            )
         }
 
         binding.back.setOnClickListener {
@@ -490,13 +503,18 @@ class ChatActivity : AppCompatActivity() {
                 .load(userAvatar)
                 .into(binding.profilePic)
         } else {
-            if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) binding.profilePic.setImageResource(R.drawable.ic_user_profile)
+            if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) binding.profilePic.setImageResource(
+                R.drawable.ic_user_profile
+            )
             else {
                 binding.profilePic.setImageResource(R.drawable.ic_group_profile)
                 binding.profilePic.setPadding(20, 20, 20, 20)
-                binding.profilePic.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
-                binding.profilePic.background = ContextCompat.getDrawable(this, R.drawable.circular_bg)
-                binding.profilePic.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_shade))
+                binding.profilePic.imageTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.white))
+                binding.profilePic.background =
+                    ContextCompat.getDrawable(this, R.drawable.circular_bg)
+                binding.profilePic.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey_shade))
             }
         }
     }

@@ -2,7 +2,6 @@ package com.ali.whatsappplus.ui.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,217 +11,200 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.RecentChatItemBinding
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat
-import com.cometchat.chat.models.Action
-import com.cometchat.chat.models.AppEntity
-import com.cometchat.chat.models.BaseMessage
-import com.cometchat.chat.models.Conversation
-import com.cometchat.chat.models.Group
-import com.cometchat.chat.models.MediaMessage
-import com.cometchat.chat.models.TextMessage
-import com.cometchat.chat.models.User
+import com.cometchat.chat.models.*
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 
 class RecentChatsAdapter(
-    val context: Context,
+    private val context: Context,
     private var conversationList: List<Conversation>
-) :
-    RecyclerView.Adapter<ViewHolder>() {
+) : RecyclerView.Adapter<RecentChatsAdapter.MyViewHolder>() {
 
     var listener: OnChatItemClickListener? = null
-    private val tag = "RecentChatsAdapter"
-    private var currentUser = CometChat.getLoggedInUser()
-    private val selectedConversation: HashMap<Int, BaseMessage> = HashMap()
+    private val currentUser = CometChat.getLoggedInUser()
+    private val selectedConversation: MutableMap<Int, BaseMessage> = mutableMapOf()
     private val selectedConversationLiveData = MutableLiveData<List<Int>>()
 
+    // ViewHolder class to hold the view references for each item in the RecyclerView
     inner class MyViewHolder(val binding: RecentChatItemBinding) :
-        RecyclerView.ViewHolder(binding.root)
+        RecyclerView.ViewHolder(binding.root) {
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): MyViewHolder {
+        // Binds the data to the views for each conversation item
+        fun bind(conversation: Conversation) {
+            val entity: AppEntity = conversation.conversationWith
+            val message: BaseMessage? = conversation.lastMessage
+
+            // Set the conversation name
+            binding.conversationName.text = when (entity) {
+                is User -> entity.name
+                is Group -> entity.name
+                else -> ""
+            }
+
+            // Load the profile picture
+            Glide.with(binding.root)
+                .load(
+                    when (entity) {
+                        is User -> entity.avatar
+                        is Group -> entity.icon
+                        else -> null
+                    } ?: getDefaultProfilePic(entity) // If URL is null, use default profile picture
+                )
+                .into(binding.profilePic)
+
+            // Configure profile picture for groups
+            if (entity is Group) {
+                configureGroupProfilePic(binding.profilePic)
+            }
+
+            // Set the last message text and timestamp if available
+            message?.let {
+                binding.lastMessage.text = getMessageText(it) // Get the last message
+                binding.lastMessageTime.text = getTimestamp(it.sentAt) // Get last message timestamp
+                binding.unreadMessageCount.text =
+                    getUnreadMessageCount(conversation.unreadMessageCount) // Get unread message count
+                binding.unreadMessageCount.visibility =
+                    if (conversation.unreadMessageCount > 0) View.VISIBLE else View.GONE
+            }
+
+            // Handle long click to toggle conversation selection
+            binding.root.setOnLongClickListener {
+                if (selectedConversation.isEmpty()) toggleConversationSelection(message!!)
+                notifyItemChanged(adapterPosition)
+                true
+            }
+
+            // Handle click to toggle conversation selection or open conversation
+            binding.root.setOnClickListener {
+                if (selectedConversation.isNotEmpty()) {
+                    toggleConversationSelection(message!!)
+                    notifyItemChanged(adapterPosition)
+                } else {
+                    openConversation(entity, conversation)
+                }
+            }
+            // Highlight selected conversation
+            selectConversation(binding, message?.id)
+        }
+
+        // Returns the default profile picture resource based on the entity type
+        private fun getDefaultProfilePic(entity: AppEntity): Int {
+            return if (entity is User) R.drawable.ic_user_profile else R.drawable.ic_group_profile
+        }
+
+        // Configures the profile picture view for group entities
+        private fun configureGroupProfilePic(profilePic: ImageView) {
+            profilePic.setPadding(20, 20, 20, 20)
+            profilePic.imageTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
+            profilePic.background = ContextCompat.getDrawable(context, R.drawable.circular_bg)
+            profilePic.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_shade))
+        }
+
+        // Returns the appropriate message text based on the message type
+        private fun getMessageText(message: BaseMessage): String {
+            return when (message) {
+                is TextMessage -> {
+                    if (message.deletedAt != 0L) {
+                        context.getString(R.string.this_messages_was_deleted)
+                    } else {
+                        message.text
+                    }
+                }
+
+                is Action -> message.message
+                is MediaMessage -> {
+                    if (message.type == CometChatConstants.MESSAGE_TYPE_IMAGE) {
+                        if (message.sender.uid == currentUser.uid) {
+                            context.getString(R.string.you_sent_image, "You")
+                        } else {
+                            context.getString(R.string.you_sent_image, message.sender.name)
+                        }
+                    } else ""
+                }
+
+                else -> ""
+            }
+        }
+
+        // Returns the formatted timestamp
+        private fun getTimestamp(timestamp: Long): String {
+            val milliseconds = timestamp * 1000
+            val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
+            return sdf.format(Date(milliseconds))
+        }
+
+        // Returns the unread message count as a string
+        private fun getUnreadMessageCount(count: Int): String {
+            return if (count in 1..10) count.toString() else "10+"
+        }
+
+        // Highlights the selected conversation
+        private fun selectConversation(binding: RecentChatItemBinding, messageId: Int?) {
+            messageId?.let {
+                binding.messageSelectionView.visibility =
+                    if (selectedConversation.containsKey(it)) View.VISIBLE else View.GONE
+            }
+        }
+
+        // Toggles the selection state of a conversation
+        private fun toggleConversationSelection(baseMessage: BaseMessage) {
+            if (selectedConversation.containsKey(baseMessage.id)) {
+                selectedConversation.remove(baseMessage.id)
+            } else {
+                selectedConversation[baseMessage.id] = baseMessage
+            }
+            selectedConversationLiveData.postValue(selectedConversation.keys.toList())
+        }
+
+        // Opens the conversation based on the entity type
+        private fun openConversation(entity: AppEntity, conversation: Conversation) {
+            if (entity is User) {
+                listener?.onChatItemClicked(
+                    entity.name,
+                    entity.uid,
+                    entity.avatar,
+                    conversation.lastMessage.receiverType
+                )
+            } else if (entity is Group) {
+                listener?.onChatItemClicked(
+                    entity.name,
+                    entity.guid,
+                    entity.icon,
+                    conversation.lastMessage.receiverType
+                )
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val binding =
             RecentChatItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MyViewHolder(binding)
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val conversation = conversationList[position]
-
-        val entity: AppEntity = conversation.conversationWith
-        val message: BaseMessage = conversation.lastMessage
-
-        // Views
-        val conversationName: TextView = viewHolder.itemView.findViewById(R.id.conversation_name)
-        val profilePic: ImageView = viewHolder.itemView.findViewById(R.id.profile_pic)
-        val lastMessage: TextView = viewHolder.itemView.findViewById(R.id.last_message)
-        val lastMessageTime: TextView = viewHolder.itemView.findViewById(R.id.last_message_time)
-        val unreadMessageCount: TextView = viewHolder.itemView.findViewById(R.id.unread_message_count)
-
-        // Set User Avatar
-        // If entity is User
-        if (entity is User) {
-            conversationName.text = entity.name
-            if (entity.avatar != null) {
-                Glide.with(viewHolder.itemView)
-                    .load(entity.avatar)
-                    .into(profilePic)
-            } else {
-                profilePic.setImageResource(R.drawable.ic_user_profile)
-            }
-        } else if (entity is Group) { // If entity is Group
-            conversationName.text = entity.name
-            if (entity.icon != null) {
-                Glide.with(viewHolder.itemView)
-                    .load(entity.icon)
-                    .into(profilePic)
-            } else {
-                profilePic.setImageResource(R.drawable.ic_group_profile)
-                profilePic.setPadding(20, 20, 20, 20)
-                profilePic.imageTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.white))
-                profilePic.background =
-                    ContextCompat.getDrawable(context, R.drawable.circular_bg)
-                profilePic.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.grey_shade))
-            }
-        }
-
-        // Set Last Message Text
-        if (message is TextMessage) {
-            if (message.deletedAt != 0L) {
-                lastMessage.text =
-                    ContextCompat.getString(context, R.string.this_messages_was_deleted)
-            } else {
-                lastMessage.text = message.text
-            }
-        } else if (message is Action) {
-            lastMessage.text = message.message
-        } else if (message is MediaMessage) {
-            if (message.type == CometChatConstants.MESSAGE_TYPE_IMAGE) {
-                if (message.sender.uid == CometChat.getLoggedInUser().uid) {
-                    val text =
-                        "You " + ContextCompat.getString(context, R.string.you_sent_image)
-                    lastMessage.text = text
-                } else {
-                    val text = message.sender.name + " " + ContextCompat.getString(
-                        context,
-                        R.string.you_sent_image
-                    )
-                    lastMessage.text = text
-                }
-            }
-        }
-
-        // Set Last Message Timestamp
-        if (message.sender == currentUser) {
-            lastMessageTime.text = getTimestamp(message.sentAt)
-        } else {
-            lastMessageTime.text = getTimestamp(message.deliveredToMeAt)
-        }
-
-        // Set unread messages count
-        if (conversation.unreadMessageCount > 0) {
-            if (conversation.unreadMessageCount in 1..10) {
-                unreadMessageCount.visibility = View.VISIBLE
-                unreadMessageCount.text = conversation.unreadMessageCount.toString()
-            } else {
-                unreadMessageCount.visibility = View.VISIBLE
-                unreadMessageCount.text = "10+"
-            }
-        } else {
-            unreadMessageCount.visibility = View.GONE
-        }
-
-        // Long Click Listener To Toggle Message Selection
-        viewHolder.itemView.setOnLongClickListener {
-            if (selectedConversation.isEmpty()) {
-                toggleConversationSelection(message)
-            }
-            notifyItemChanged(viewHolder.adapterPosition) // Refresh View To Update Selection State
-            true
-        }
-
-        // Short Click listener To Toggle Message Selection And Conversation Opening
-        viewHolder.itemView.setOnClickListener {
-            if (selectedConversation.isNotEmpty()) {
-                toggleConversationSelection(message)
-                notifyItemChanged(viewHolder.adapterPosition) // Refresh View To Update Selection State
-            } else {
-                if (entity is User) {
-                    listener?.onChatItemClicked(
-                        entity.name,
-                        entity.uid,
-                        entity.avatar,
-                        conversation.lastMessage.receiverType
-                    )
-                }
-                if (entity is Group) {
-                    listener?.onChatItemClicked(
-                        entity.name,
-                        entity.guid,
-                        entity.icon,
-                        conversation.lastMessage.receiverType
-                    )
-                }
-            }
-        }
-
-        // Select message
-        selectConversation(viewHolder, message.id)
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        holder.bind(conversationList[position])
     }
 
-    // Get last message timestamp
-    private fun getTimestamp(timestamp: Long): String {
-        val milliseconds = timestamp * 1000
-        val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
-        return sdf.format(Date(milliseconds))
-    }
+    override fun getItemCount(): Int = conversationList.size
 
-    private fun selectConversation(
-        viewHolder: RecyclerView.ViewHolder,
-        messageId: Int
-    ) {
-        val messageSelectionView =
-            viewHolder.itemView.findViewById<View>(R.id.message_selection_view)
-        messageSelectionView?.visibility =
-            if (selectedConversation.contains(messageId)) View.VISIBLE else View.GONE
-    }
-
-    fun getSelectedConversationLiveData(): LiveData<List<Int>> {
-        return selectedConversationLiveData
-    }
-
-    private fun toggleConversationSelection(baseMessage: BaseMessage) {
-        if (selectedConversation.containsKey(baseMessage.id)) {
-            // If already selected, deselect the message
-            selectedConversation.remove(baseMessage.id)
-        } else {
-            // If not selected, select the message
-            selectedConversation[baseMessage.id] = baseMessage
-        }
-        selectedConversationLiveData.postValue(selectedConversation.keys.toList())
-    }
-
-
-    override fun getItemCount(): Int {
-        return conversationList.size
-    }
-
+    // Updates the conversation list and notifies the adapter
     fun setData(conversationList: List<Conversation>) {
         this.conversationList = conversationList
         notifyDataSetChanged()
     }
 
+    // Returns a LiveData object representing the selected conversation IDs
+    fun getSelectedConversationLiveData(): LiveData<List<Int>> = selectedConversationLiveData
+
+    // Interface for handling chat item clicks
     interface OnChatItemClickListener {
         fun onChatItemClicked(
             username: String,
@@ -232,5 +214,3 @@ class RecentChatsAdapter(
         )
     }
 }
-
-

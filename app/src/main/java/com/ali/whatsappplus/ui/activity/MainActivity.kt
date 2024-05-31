@@ -1,10 +1,13 @@
 package com.ali.whatsappplus.ui.activity
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager.widget.ViewPager
 import com.ali.whatsappplus.Application
 import com.ali.whatsappplus.R
@@ -15,12 +18,9 @@ import com.ali.whatsappplus.ui.fragment.CallLogFragment
 import com.ali.whatsappplus.ui.fragment.RecentChatsFragment
 import com.ali.whatsappplus.ui.fragment.UpdatesFragment
 import com.ali.whatsappplus.util.Constants
-import com.cometchat.calls.model.CallGroup
-import com.cometchat.calls.model.CallUser
 import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.Call
 import com.cometchat.chat.core.CometChat
-import com.cometchat.chat.helpers.Logger
 import com.google.android.material.tabs.TabLayout
 
 class MainActivity : AppCompatActivity() {
@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: MainViewPagerAdapter
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
-    private var uid = "superhero1"
     private val listenerId = "CallListener"
     private lateinit var bottomSheetDialog: LoginBottomSheetDialog
     private var TAG = "MainActivity"
@@ -39,9 +38,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         val myApplication: Application = (application as Application)
         myApplication.setCurrentActivity(this)
-        // Logger.enableLogs("221089")
 
         setUpTabs() // Tab Layout And ViewPager Setup
+        createNotificationChannel()
 
         // All Contacts/ New Chat Floating Action Button
         binding.newChatButton.setOnClickListener {
@@ -60,6 +59,22 @@ class MainActivity : AppCompatActivity() {
 
         binding.search.setOnClickListener {
             showToast("Search")
+        }
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create channel to show notifications.
+            val channelId = getString(R.string.default_notification_channel_id)
+            val channelName = getString(R.string.default_notification_channel_name)
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(
+                NotificationChannel(
+                    channelId,
+                    channelName,
+                    NotificationManager.IMPORTANCE_LOW,
+                ),
+            )
         }
     }
 
