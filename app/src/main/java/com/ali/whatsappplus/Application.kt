@@ -4,18 +4,23 @@ import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.ali.whatsappplus.ui.activity.MainActivity
+import com.ali.whatsappplus.ui.activity.VoiceCall
 import com.ali.whatsappplus.util.Constants
 import com.ali.whatsappplus.util.cometchatnotification.CometChatNotification
 import com.cometchat.calls.core.CallAppSettings
 import com.cometchat.calls.core.CometChatCalls
+import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.AppSettings
+import com.cometchat.chat.core.Call
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.exceptions.CometChatException
+import com.cometchat.chat.models.Group
 import com.cometchat.chat.models.User
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseApp
@@ -38,7 +43,6 @@ class Application : Application() {
 
     }
 
-    // Initialize CometChat Calls
     private fun cometChatCallsInit() {
         val callAppSettings = CallAppSettings.CallAppSettingBuilder()
             .setAppId(Constants.APP_ID)
@@ -50,11 +54,11 @@ class Application : Application() {
             callAppSettings,
             object : CometChatCalls.CallbackListener<String>() {
                 override fun onSuccess(s: String?) {
-                    Log.d(TAG, "CometChatCalls initialization completed successfully")
+                    Log.i(TAG, "CometChatCalls initialization completed successfully")
                 }
 
                 override fun onError(p0: com.cometchat.calls.exceptions.CometChatException?) {
-                    Log.d(
+                    Log.e(
                         TAG,
                         "CometChatCalls initialization failed with exception: " + p0?.message
                     )
@@ -70,12 +74,13 @@ class Application : Application() {
             Constants.AUTH_KEY,
             object : CometChat.CallbackListener<User>() {
                 override fun onSuccess(p0: User?) {
-                    Log.d(TAG, "Login Successful : " + p0?.toString())
+                    Log.i(TAG, "Login Successful : " + p0?.toString())
                     retrieveFcmRegistrationToken()
+                    callListeners()
                 }
 
                 override fun onError(p0: CometChatException?) {
-                    Log.d(TAG, "Login failed with exception: " + p0?.message)
+                    Log.e(TAG, "Login failed with exception: " + p0?.message)
                 }
 
             }
@@ -165,6 +170,65 @@ class Application : Application() {
             val msg = getString(R.string.msg_token_fmt, token)
             Log.d(TAG, msg)
             Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+        })
+    }
+
+    private fun callListeners() { // Listener for incoming, outgoing, call accept, call reject.
+
+        CometChat.addCallListener("listenerId",object : CometChat.CallListener(){
+
+            override fun onOutgoingCallAccepted(p0: Call?) {
+                Log.d(TAG, "Outgoing call accepted: " + p0?.callStatus)
+            }
+
+            override fun onIncomingCallReceived(call: Call?) {
+                Log.d(TAG, "Incoming call: " + call?.toString())
+                if (call != null){
+                    val receiverType = call.receiverType
+                    val intent = Intent(this@Application, VoiceCall::class.java)
+
+                    if (receiverType == CometChatConstants.RECEIVER_TYPE_USER){
+                        intent.putExtra(Constants.USER_NAME, call.sender.name)
+                        intent.putExtra(Constants.AVATAR, call.sender.avatar)
+                        intent.putExtra(Constants.RECEIVER_ID, call.sender.uid)
+                        intent.putExtra(Constants.RECEIVER_TYPE, call.receiverType)
+                        intent.putExtra(Constants.FRAGMENT_TO_LOAD, Constants.INCOMING_CALL_FRAGMENT)
+                        intent.putExtra(Constants.CALL_SESSION_ID, call.sessionId)
+                        Log.d(TAG, "onIncomingCallReceived, Receiver Type: ${call.receiverType}")
+                        intent.flags = FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                    } else {
+                        val initiator = call.callReceiver
+                        if (initiator is Group) {
+                            intent.putExtra(Constants.USER_NAME, initiator.name)
+                            intent.putExtra(Constants.RECEIVER_ID, initiator.guid)
+                            intent.putExtra(Constants.AVATAR, initiator.icon)
+                            intent.putExtra(Constants.RECEIVER_TYPE, receiverType)
+                            intent.putExtra(Constants.CALL_SESSION_ID, call.sessionId)
+                            intent.putExtra(
+                                Constants.FRAGMENT_TO_LOAD,
+                                Constants.INCOMING_CALL_FRAGMENT
+                            )
+                            Log.d(TAG, "onIncomingCallReceived, Receiver Type: ${call.receiverType}")
+                            intent.flags = FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                        }
+                    }
+                }
+            }
+
+            override fun onIncomingCallCancelled(p0: Call?) {
+                Log.d(TAG, "Incoming call cancelled: " + p0?.toString())
+            }
+
+            override fun onOutgoingCallRejected(p0: Call?) {
+                Log.d(TAG, "Outgoing call rejected: " + p0?.callStatus)
+            }
+
+            override fun onCallEndedMessageReceived(p0: Call?) {
+                Log.d(TAG, "End call message received: " + p0?.toString())
+            }
+
         })
     }
 }

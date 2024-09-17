@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,14 +29,14 @@ import com.cometchat.chat.models.CustomMessage
 import com.cometchat.chat.models.MediaMessage
 import com.cometchat.chat.models.TextMessage
 
-class RecentChatsFragment : Fragment() {
+class ConversationsFragment : Fragment() {
 
     private lateinit var binding: FragmentRecentChatsBinding
     private lateinit var viewModel: RecentChatsViewModel
     private lateinit var adapter: RecentChatsAdapter
     private var conversationList: MutableList<Conversation> = mutableListOf()
     private lateinit var conversationsRequest: ConversationsRequest
-    private val tag = "RecentChatsFragment"
+    private val tag = "ConversationsFragment"
     private var selectedConversations: List<Int> = emptyList()
 
     override fun onCreateView(

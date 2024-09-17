@@ -101,6 +101,8 @@ class OutgoingCallFragment : Fragment() {
                 override fun onSuccess(call: Call) {
                     sessionID = call.sessionId
                     binding.callDuration.text = "Ringing"
+                    Log.d(TAG, "onSuccess initiateCall, Call Type - ${call.receiverType}")
+
                 }
 
                 override fun onError(e: CometChatException) {

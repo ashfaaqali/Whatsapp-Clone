@@ -9,13 +9,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,6 +39,7 @@ import com.cometchat.chat.models.MediaMessage
 import com.cometchat.chat.models.MessageReceipt
 import com.cometchat.chat.models.TextMessage
 import com.cometchat.chat.models.TypingIndicator
+import org.w3c.dom.Text
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -115,7 +113,7 @@ class ChatActivity : AppCompatActivity() {
         handleIntentData()
         setUserData()
         setupRecyclerView()
-        fetchMessage()
+        triggerListeners()
 
         binding.messageEditText.addTextChangedListener(mTextEditorWatcher)
 
@@ -184,12 +182,12 @@ class ChatActivity : AppCompatActivity() {
     private fun deleteSelectedMessage(messageId: Int) {
         CometChat.deleteMessage(messageId, object : CallbackListener<BaseMessage>() {
             override fun onSuccess(message: BaseMessage) {
-                Log.d(TAG, "deleteMessage onSuccess : " + message.deletedAt)
+                Log.i(TAG, "deleteMessage onSuccess : " + message.deletedAt)
                 chatAdapter.removeMessage(message)
             }
 
             override fun onError(e: CometChatException) {
-                Log.d(TAG, "deleteMessage onError : " + e.message)
+                Log.e(TAG, "deleteMessage onError : " + e.message)
             }
 
         })
@@ -253,7 +251,6 @@ class ChatActivity : AppCompatActivity() {
     }
 
     private fun fetchMessage() {
-
         if (messagesRequest == null) {
             messagesRequest = if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) {
                 MessagesRequest.MessagesRequestBuilder()
@@ -269,59 +266,69 @@ class ChatActivity : AppCompatActivity() {
                     .build()
             }
         }
+        fetchPreviousMessages()
+    }
 
+    private fun fetchPreviousMessages() {
         messagesRequest?.fetchPrevious(object : CallbackListener<List<BaseMessage>>() {
             override fun onSuccess(baseMessages: List<BaseMessage>) {
-                for (message in baseMessages) {
-                    if (message is TextMessage) {
-                        Log.d(TAG, "Text message received successfully: $message")
-                    } else if (message is MediaMessage) {
-                        Log.d(TAG, "Media message received successfully: $message")
-                    }
-                }
-                if (baseMessages.isNotEmpty()) {
-                    val baseMessage = baseMessages[baseMessages.size - 1]
-                    markAsRead(baseMessage)
-                }
-                isInProgress = false
-                chatAdapter.updateList(baseMessages)
-
-                // Calculate the number of items added
-                val itemsAdded = baseMessages.size
-                if (itemsAdded > 0) {
-                    binding.chatMessagesRecyclerView.scrollToPosition(itemsAdded)
-                }
-
-                if (baseMessages.isEmpty()) {
-                    hasNoMoreMessages = true
-                }
+                handleMessagesFetched(baseMessages)
             }
 
             override fun onError(e: CometChatException) {
-                Log.d(TAG, "Message fetching failed with exception: " + e.message)
+                Log.e(TAG, "Previous messages fetching failed: ${e.message}")
             }
         })
     }
 
-    private fun scrollToBottom() {
-        if (chatAdapter.itemCount > 0) {
-            binding.chatMessagesRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+    private fun fetchNextMessages() {
+        latestReceivedMessageId = CometChat.getLastDeliveredMessageId()
+        messagesRequest?.fetchNext(object : CallbackListener<List<BaseMessage>>() {
+            override fun onSuccess(baseMessages: List<BaseMessage>) {
+                handleMessagesFetched(baseMessages)
+            }
+
+            override fun onError(e: CometChatException) {
+                Log.e(TAG, "Next messages fetching failed: ${e.message}. Last received message ID: $latestReceivedMessageId")
+            }
+        })
+    }
+
+    private fun handleMessagesFetched(baseMessages: List<BaseMessage>) {
+        if (baseMessages.isNotEmpty()) {
+            baseMessages.forEach { message ->
+                Log.i(TAG, "Message fetched: ${message.id} readAt: ${message.readAt}")
+            }
+
+            val lastMessage = baseMessages.last()
+            markAsRead(lastMessage)
+            chatAdapter.updateList(baseMessages)
+
+            // Scroll to the new messages
+            scrollToNewMessages(baseMessages.size)
+        } else {
+            hasNoMoreMessages = true
+        }
+        isInProgress = false
+    }
+
+    private fun scrollToNewMessages(itemsAdded: Int) {
+        if (itemsAdded > 0) {
+            binding.chatMessagesRecyclerView.scrollToPosition(itemsAdded)
         }
     }
 
     private fun sendMessage(message: String) {
-        val receiverType =
-            if (receiverType == CometChatConstants.RECEIVER_TYPE_USER) CometChatConstants.RECEIVER_TYPE_USER else CometChatConstants.RECEIVER_TYPE_GROUP
         val textMessage = TextMessage(receiverId, message, receiverType)
-        textMessage.sender = CometChat.getLoggedInUser()
+        // textMessage.tags = mutableListOf("hero", "coco")
         CometChat.sendMessage(textMessage, object : CallbackListener<TextMessage>() {
             override fun onSuccess(message: TextMessage) {
                 addMessageToChat(message)
-                Log.i(TAG, "Message Sent Success: $message")
+                Log.i(TAG, "sendMessage onSuccess: ${message.id}")
             }
 
             override fun onError(p0: CometChatException?) {
-                Log.i(TAG, "Message Sent Failed: $p0 [$receiverType] [$receiverId]")
+                Log.e(TAG, "sendMessage onError: ${p0?.message}")
             }
         })
     }
@@ -345,7 +352,6 @@ class ChatActivity : AppCompatActivity() {
                 CometChatConstants.RECEIVER_TYPE_GROUP
             )
 
-        mediaMessage.sender = CometChat.getLoggedInUser()
         sendMediaMessage(mediaMessage, object : CallbackListener<MediaMessage>() {
             override fun onSuccess(message: MediaMessage) {
                 addMessageToChat(message)
@@ -362,33 +368,20 @@ class ChatActivity : AppCompatActivity() {
     private fun triggerListeners() {
         CometChat.addMessageListener(TAG, object : CometChat.MessageListener() {
             override fun onTextMessageReceived(textMessage: TextMessage?) {
+                Log.i(TAG, "onTextMessageReceived: $textMessage")
                 if (textMessage != null) {
-                    if (isUser()) markAsDelivered(
-                        textMessage.id,
-                        textMessage.receiverUid,
-                        CometChatConstants.RECEIVER_TYPE_USER,
-                        textMessage.sender.uid
-                    )
-                    else markAsDelivered(
-                        textMessage.id,
-                        textMessage.receiverUid,
-                        CometChatConstants.RECEIVER_TYPE_GROUP,
-                        textMessage.sender.uid
-                    )
-                    markAsRead(textMessage)
-                    chatAdapter.addMessage(textMessage)
-                    Log.i(TAG, "onTextMessageReceived: $textMessage")
-                    binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                    markMessageAsDelivered(textMessage)
+                    markMessageAsRead(textMessage)
+                    addMessageToChat(textMessage)
                 }
             }
 
             override fun onMediaMessageReceived(mediaMessage: MediaMessage?) {
                 Log.i(TAG, "onMediaMessageReceived: ${mediaMessage?.file}")
                 if (mediaMessage != null) {
-                    markAsDelivered(mediaMessage)
-                    markAsRead(mediaMessage)
-                    chatAdapter.addMessage(mediaMessage)
-                    binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                    markMessageAsDelivered(mediaMessage)
+                    markMessageAsRead(mediaMessage)
+                    addMessageToChat(mediaMessage)
                 }
             }
 
@@ -411,9 +404,32 @@ class ChatActivity : AppCompatActivity() {
             }
 
             override fun onMessagesRead(messageReadReceipt: MessageReceipt?) {
-                Log.d(TAG, "onMessageDelivered: $messageReadReceipt")
+                Log.d(TAG, "onMessagesRead: $messageReadReceipt")
+            }
+        })
+    }
+
+    private fun markMessageAsRead(baseMessage: BaseMessage) {
+        markAsRead(baseMessage.id, baseMessage.receiverUid, baseMessage.receiverType, baseMessage.sender.uid, object : CallbackListener<Void?>() {
+            override fun onSuccess(unused: Void?) {
+                Log.i(TAG, "markAsRead onSuccess : messageId : ${baseMessage.id} readAt : ${baseMessage.deliveredAt}")
             }
 
+            override fun onError(e: CometChatException) {
+                Log.e(TAG, "markAsRead onError : " + e.message)
+            }
+        })
+    }
+
+    private fun markMessageAsDelivered(baseMessage: BaseMessage) {
+        markAsDelivered(baseMessage.id, baseMessage.receiverUid, baseMessage.receiverType, baseMessage.sender.uid, object : CallbackListener<Void?>() {
+            override fun onSuccess(unused: Void?) {
+                Log.i(TAG, "markAsDelivered onSuccess : messageId : ${baseMessage.id} deliveredAt : ${baseMessage.deliveredAt}")
+            }
+
+            override fun onError(e: CometChatException) {
+                Log.e(TAG, "markAsDelivered onError : " + e.message)
+            }
         })
     }
 
@@ -421,38 +437,14 @@ class ChatActivity : AppCompatActivity() {
         return receiverType == "user"
     }
 
-    private fun fetchMissedMessages() {
-        latestReceivedMessageId = CometChat.getLastDeliveredMessageId()
-        Log.d(TAG, "Latest Message ID: $latestReceivedMessageId")
+    private fun fetchMessagesHistory() {
 
-        messagesRequest?.fetchNext(object : CallbackListener<List<BaseMessage?>>() {
-            override fun onSuccess(list: List<BaseMessage?>) {
-                for (message in list) {
-                    if (message is TextMessage) {
-                        Log.d(TAG, "Missed Text message received successfully: $message")
-                        messageList.add(message)
-                        binding.chatMessagesRecyclerView.smoothScrollToPosition(chatAdapter.itemCount)
-                        chatAdapter.notifyDataSetChanged()
-                    } else if (message is MediaMessage) {
-                        Log.d(TAG, "Missed Media message received successfully: $message")
-                    }
-                }
-            }
-
-            override fun onError(e: CometChatException) {
-                Log.d(
-                    TAG,
-                    "Missed Message fetching failed with exception: " + e.message + latestReceivedMessageId
-                )
-            }
-        })
     }
 
     private fun handleIntentData() {
         if (intent != null) {
             userName = intent.getStringExtra(Constants.USER_NAME).toString()
             userAvatar = intent.getStringExtra(Constants.AVATAR)
-            Log.i(TAG, "userAvatar: $userAvatar")
             receiverId = intent.getStringExtra(Constants.RECEIVER_ID).toString()
             receiverType = intent.getStringExtra(Constants.RECEIVER_TYPE).toString()
         } else {
@@ -485,8 +477,7 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // This method triggers listeners for Messages, Typing Indicators, Messages Delivered & Messages Read.
-        triggerListeners()
+        fetchMessage()
     }
 
     override fun onPause() {

@@ -1,6 +1,7 @@
 package com.ali.whatsappplus.ui.fragment.call
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +10,10 @@ import androidx.fragment.app.Fragment
 import com.ali.whatsappplus.databinding.FragmentIncomingCallBinding
 import com.ali.whatsappplus.util.Constants
 import com.bumptech.glide.Glide
+import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.Call
 import com.cometchat.chat.core.CometChat
-import com.cometchat.chat.core.CometChat.CallListener
+import com.cometchat.chat.exceptions.CometChatException
 
 class IncomingCallFragment : Fragment() {
 
@@ -20,8 +22,8 @@ class IncomingCallFragment : Fragment() {
     private var receiverType: String? = null
     private var userName: String? = null
     private var userAvatar: String? = null
+    private var sessionID: String? = null
     private var isPresenter: Boolean = false
-    private val listenerId = "call_listener"
     private val TAG = "IncomingCallFragment"
 
     override fun onCreateView(
@@ -29,6 +31,7 @@ class IncomingCallFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentIncomingCallBinding.inflate(layoutInflater)
+        Log.d(TAG, "onCreateView: TEST")
         statusBarTransparent() // Set transparent status bar for call screen
         return binding.root
     }
@@ -37,24 +40,43 @@ class IncomingCallFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         handleArgumentsData() // Get arguments data
         setDataToViews() // Set the data to the views (Name, avatar etc.)
+        binding.callRejectBtn.setOnClickListener {
+            rejectCall()
+        }
+
+        binding.callAcceptBtn.setOnClickListener {
+            acceptCall()
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        incomingCallListener() // Call Listener
-    }
+    private fun acceptCall() {
+        CometChat.acceptCall(sessionID!!, object : CometChat.CallbackListener<Call>() {
+            override fun onSuccess(p0: Call?) {
+                Log.d(TAG, "onSuccess: acceptCall: ${p0?.callStatus}")
+            }
 
-    private fun incomingCallListener() {
-        CometChat.addCallListener(listenerId, object : CallListener() {
-            override fun onIncomingCallReceived(p0: Call?) {}
-            override fun onOutgoingCallAccepted(p0: Call?) {}
-            override fun onOutgoingCallRejected(p0: Call?) {}
-
-            override fun onIncomingCallCancelled(p0: Call?) {
-                closeFragment()
+            override fun onError(p0: CometChatException?) {
+                // TODO("Not yet implemented")
             }
 
         })
+    }
+
+    private fun rejectCall() {
+        if (sessionID != null) {
+            CometChat.rejectCall(
+                sessionID!!,
+                CometChatConstants.CALL_STATUS_REJECTED,
+                object : CometChat.CallbackListener<Call>() {
+                    override fun onSuccess(p0: Call?) {
+                        closeFragment()
+                    }
+
+                    override fun onError(p0: CometChatException?) {
+                        Log.d(TAG, "Call rejection failed with exception: " + p0?.message)
+                    }
+                })
+        }
     }
 
     // Method to finish current activity (VoiceCall activity)
@@ -70,6 +92,7 @@ class IncomingCallFragment : Fragment() {
             userAvatar = requireArguments().getString(Constants.AVATAR)
             receiverId = requireArguments().getString(Constants.RECEIVER_ID)
             receiverType = requireArguments().getString(Constants.RECEIVER_TYPE)
+            sessionID = requireArguments().getString(Constants.CALL_SESSION_ID)
             isPresenter = requireArguments().getBoolean(Constants.IS_PRESENTER)
         } else {
             Toast.makeText(requireContext(), "Error Loading Data", Toast.LENGTH_SHORT).show()

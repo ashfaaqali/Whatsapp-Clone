@@ -42,12 +42,12 @@ android {
 
 dependencies {
 
-    //Gson
+    // Gson
     implementation ("com.google.code.gson:gson:2.10.1")
 
     // CometChat
-    implementation ("com.cometchat:chat-sdk-android:4.0.6")
-    implementation ("com.cometchat:calls-sdk-android:4.0.5")
+    implementation ("com.cometchat:chat-sdk-android:4.0.9")
+    implementation ("com.cometchat:calls-sdk-android:4.0.6")
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.0.0"))

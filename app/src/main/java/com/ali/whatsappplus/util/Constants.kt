@@ -3,9 +3,9 @@ package com.ali.whatsappplus.util
 object Constants {
 
     // App Credentials
-    const val APP_ID = "2560595837ef79ae"
-    const val REGION = "IN"
-    const val AUTH_KEY = "3c9d2e4725ad3a7821f4e14c711d9eae88f91357"
+    const val APP_ID = ""
+    const val REGION = ""
+    const val AUTH_KEY = ""
 
     const val LOGIN_BOTTOM_SHEET_TAG = "LOGIN_BOTTOM_SHEET_DIALOG"
     const val ATTACHMENTS_BOTTOM_SHEET_TAG = "ATTACHMENTS_BOTTOM_SHEET_DIALOG"
@@ -31,4 +31,6 @@ object Constants {
     const val INITIATED_BY_USER = "initiated_by_user"
     const val IS_PRESENTER = "is_presenter"
     const val CALL_TOKEN = "call_token"
+    const val CALL_SESSION_ID = "call_token"
+
 }

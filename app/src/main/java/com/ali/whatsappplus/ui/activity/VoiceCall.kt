@@ -27,6 +27,7 @@ class VoiceCall : AppCompatActivity() {
     private var receiverType: String? = null
     private var userName: String? = null
     private var userAvatar: String? = null
+    private var sessionID: String? = null
     private var callToken = ""
     private var dialog: AlertDialog? = null
     private var fragmentToLoad = ""
@@ -41,8 +42,8 @@ class VoiceCall : AppCompatActivity() {
         if (fragmentToLoad == Constants.OUTGOING_CALL_FRAGMENT) { // Show the OutgoingCallFragment to the INITIATOR
             val args = Bundle()
             args.putString(Constants.USER_NAME, userName)
-            args.putString(Constants.AVATAR, userAvatar)
             args.putString(Constants.RECEIVER_ID, receiverId)
+            args.putString(Constants.AVATAR, userAvatar)
             args.putString(Constants.RECEIVER_TYPE, receiverType)
             startFragment(OutgoingCallFragment(), args) // Show the fragment
         } else if (fragmentToLoad == Constants.PRESENTER_FRAGMENT) { // Show the PresenterFragment
@@ -63,9 +64,10 @@ class VoiceCall : AppCompatActivity() {
         } else if (fragmentToLoad == Constants.INCOMING_CALL_FRAGMENT) { // Show the IncomingCallFragment to the RECEIVER
             val args = Bundle()
             args.putString(Constants.USER_NAME, userName)
-            args.putString(Constants.AVATAR, userAvatar)
             args.putString(Constants.RECEIVER_ID, receiverId)
+            args.putString(Constants.AVATAR, userAvatar)
             args.putString(Constants.RECEIVER_TYPE, receiverType)
+            args.putString(Constants.CALL_SESSION_ID, sessionID)
             startFragment(IncomingCallFragment(), args) // Show the fragment
         }
     }
@@ -127,6 +129,7 @@ class VoiceCall : AppCompatActivity() {
             userAvatar = intent.getStringExtra(Constants.AVATAR)
             receiverId = intent.getStringExtra(Constants.RECEIVER_ID)
             receiverType = intent.getStringExtra(Constants.RECEIVER_TYPE)
+            sessionID = intent.getStringExtra(Constants.CALL_SESSION_ID)
             fragmentToLoad = intent.getStringExtra(Constants.FRAGMENT_TO_LOAD).toString()
         } else {
             Toast.makeText(applicationContext, "Error Loading Data", Toast.LENGTH_SHORT).show()

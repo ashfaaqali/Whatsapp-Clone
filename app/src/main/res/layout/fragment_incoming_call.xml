@@ -62,6 +62,7 @@
         app:tint="@color/white" />
 
     <ImageView
+        android:id="@+id/call_reject_btn"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:src="@drawable/ic_call_end"

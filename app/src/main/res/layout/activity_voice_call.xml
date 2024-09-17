@@ -5,4 +5,283 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#192828"
-    tools:context=".ui.activity.VoiceCall"/>
+    tools:context=".ui.activity.VoiceCall" />
+
+    <!--<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/main"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="#192828"
+tools:context=".ui.activity.VoiceCall">
+
+<FrameLayout
+    android:id="@+id/frame_Layout"
+    android:visibility="gone"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
+
+&lt;!&ndash; Outgoing Call Views &ndash;&gt;
+<RelativeLayout
+    android:id="@+id/video_container"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:visibility="visible"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintHeight_percent="1"
+    app:layout_constraintTop_toTopOf="parent" />
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/end_to_end_encryption_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="30dp"
+    android:orientation="horizontal"
+    android:visibility="visible"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <ImageView
+        android:id="@+id/lock_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:src="@drawable/ic_lock"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/encrypted"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/light_grey" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/encrypted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:text="@string/end_to_end_encrypted"
+        android:textAlignment="center"
+        android:textColor="@color/light_grey"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/add_person_icon"
+        app:layout_constraintHorizontal_bias=".65"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/add_person_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_person_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+<ImageView
+    android:id="@+id/avatar"
+    android:layout_width="120dp"
+    android:layout_height="120dp"
+    android:src="@drawable/profile"
+    android:visibility="visible"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/end_to_end_encryption_layout"
+    app:layout_constraintVertical_bias=".05" />
+
+<TextView
+    android:id="@+id/contact_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:fontFamily="sans-serif-medium"
+    android:text="Ashfaq"
+    android:textColor="@color/white"
+    android:textSize="22sp"
+    android:visibility="visible"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/avatar"
+    app:layout_constraintVertical_bias="0.03" />
+
+<TextView
+    android:id="@+id/call_duration"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Calling"
+    android:textColor="@color/light_grey"
+    android:textSize="18sp"
+    android:visibility="visible"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/contact_name"
+    app:layout_constraintVertical_bias="0.01" />
+
+<LinearLayout
+    android:id="@+id/outgoing_call_controls"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#233737"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="18dp"
+    android:visibility="visible"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/call_duration"
+    app:layout_constraintVertical_bias="1">
+
+    <ImageView
+        android:id="@+id/speaker_btn"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_weight=".9"
+        android:padding="4dp"
+        android:src="@drawable/ic_speaker"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/video_btn"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_weight=".9"
+        android:padding="4dp"
+        android:src="@drawable/ic_video"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/speaker_btn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/mute_unmute_btn"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_weight=".9"
+        android:padding="4dp"
+        android:src="@drawable/ic_unmute"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/video_btn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/cancel_outgoing_call_btn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="4dp"
+        android:background="@drawable/circular_bg"
+        android:backgroundTint="#CA0000"
+        android:padding="8dp"
+        android:src="@drawable/ic_end_call"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/mute_unmute_btn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white" />
+</LinearLayout>
+
+&lt;!&ndash; Incoming Call Views &ndash;&gt;
+&lt;!&ndash;<ImageView
+    android:id="@+id/caller_profile_pic"
+    android:layout_width="120dp"
+    android:layout_height="120dp"
+    android:src="@drawable/profile"
+    android:visibility="visible"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias=".05" />&ndash;&gt;
+
+&lt;!&ndash;<TextView
+    android:id="@+id/caller_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:fontFamily="sans-serif-medium"
+    android:text="Ashfaq"
+    android:textColor="@color/white"
+    android:textSize="22sp"
+    android:visibility="gone"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/caller_profile_pic"
+    app:layout_constraintVertical_bias="0.03" />&ndash;&gt;
+
+&lt;!&ndash;<TextView
+    android:id="@+id/whatsapp_voice_call"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="WhatsApp voice call"
+    android:textColor="@color/light_grey"
+    android:textSize="18sp"
+    android:visibility="gone"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/caller_name"
+    app:layout_constraintVertical_bias="0.01" />&ndash;&gt;
+
+<ImageView
+    android:id="@+id/call_accept_btn"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:src="@drawable/ic_voice"
+    android:padding="10dp"
+    android:background="@drawable/circular_bg"
+    android:backgroundTint="#00A035"
+    android:visibility="visible"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintVertical_bias="0.9"
+    app:tint="@color/white" />
+
+<ImageView
+    android:id="@+id/call_end_btn"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:src="@drawable/ic_call_end"
+    android:padding="15dp"
+    android:background="@drawable/circular_bg"
+    android:backgroundTint="@color/dark"
+    android:visibility="visible"
+    app:layout_constraintTop_toTopOf="@id/call_accept_btn"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toStartOf="@id/call_accept_btn"
+    app:layout_constraintBottom_toBottomOf="@id/call_accept_btn"
+    app:tint="@android:color/holo_red_dark" />
+
+<ImageView
+    android:id="@+id/chat_btn"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:src="@drawable/ic_chat"
+    android:padding="15dp"
+    android:background="@drawable/circular_bg"
+    android:backgroundTint="@color/dark"
+    android:visibility="visible"
+    app:layout_constraintTop_toTopOf="@id/call_accept_btn"
+    app:layout_constraintStart_toEndOf="@id/call_accept_btn"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toBottomOf="@id/call_accept_btn"
+    app:layout_constraintVertical_bias="0.9"
+    app:tint="@color/white" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>-->
