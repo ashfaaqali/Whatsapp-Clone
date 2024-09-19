@@ -112,7 +112,7 @@ class Application : Application() {
             object : CometChat.CallbackListener<String>() {
                 override fun onSuccess(p0: String?) {
                     Log.d(TAG, "CometChat Initialization completed successfully")
-                    loginUser("superhero1") // CometChat login
+                    loginUser("cometchat-uid-1") // CometChat login
                 }
 
                 override fun onError(p0: CometChatException?) {

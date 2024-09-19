@@ -32,25 +32,25 @@ class LoginBottomSheetDialog : BottomSheetDialogFragment() {
 
         binding.superhero1.setOnClickListener {
             showProgressBar()
-            application.logoutAndLogin("superhero1")
+            application.logoutAndLogin("cometchat-uid-1")
             dismiss()
         }
 
         binding.superhero2.setOnClickListener {
             showProgressBar()
-            application.logoutAndLogin("superhero2")
+            application.logoutAndLogin("cometchat-uid-2")
             dismiss()
         }
 
         binding.superhero3.setOnClickListener {
             showProgressBar()
-            application.logoutAndLogin("superhero3")
+            application.logoutAndLogin("cometchat-uid-3")
             dismiss()
         }
 
         binding.superhero4.setOnClickListener {
             showProgressBar()
-            application.logoutAndLogin("superhero4")
+            application.logoutAndLogin("cometchat-uid-4")
             dismiss()
         }
 
