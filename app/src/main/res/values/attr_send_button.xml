@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="SendButton" >
+
+        <attr name="sendButtonBackground" format="reference" />
+        <attr name="sendButtonIcon" format="reference" />
+        <attr name="sendButtonIconTint" format="reference" />
+        <attr name="sendButtonIconSize" format="dimension" />
+        <attr name="sendButtonIconPadding" format="dimension" />
+        <attr name="sendButtonIconMargin" format="dimension" />
+        <attr name="sendButtonRippleColor" format="reference" />
+        <attr name="sendButtonStyle" format="reference" />
+
+    </declare-styleable>
+
+</resources>

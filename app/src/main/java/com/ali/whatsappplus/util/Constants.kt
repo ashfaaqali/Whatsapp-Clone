@@ -1,12 +1,7 @@
 package com.ali.whatsappplus.util
 
 object Constants {
-
-    // App Credentials
-    const val APP_ID = ""
-    const val REGION = ""
-    const val AUTH_KEY = ""
-
+    const val DEFAULT_USER_ID = "ashfaq-ali"
     const val LOGIN_BOTTOM_SHEET_TAG = "LOGIN_BOTTOM_SHEET_DIALOG"
     const val ATTACHMENTS_BOTTOM_SHEET_TAG = "ATTACHMENTS_BOTTOM_SHEET_DIALOG"
     const val USER_NAME = "username"

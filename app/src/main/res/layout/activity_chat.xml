@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#D5D8C9"
     android:orientation="vertical"
-    tools:context=".ui.activity.ChatActivity">
+    tools:context=".ui.chat.ChatActivity">
 
     <LinearLayout
         android:id="@+id/toolbar"

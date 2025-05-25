@@ -8,81 +8,42 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
-    private val TAG = "MyFirebaseMessagingService"
-    private lateinit var cometChatNotification: CometChatNotification
 
-    override fun onCreate() {
-        super.onCreate()
-        cometChatNotification = CometChatNotification.getInstance(this)
-    }
+    private val TAG = "MyFirebaseMessagingService"
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d(TAG, "From: ${remoteMessage.from}")
 
-        // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "Message data payload: ${remoteMessage.data}")
-            if (cometChatNotification.isCometChatNotification(remoteMessage)){
-                cometChatNotification.renderCometChatNotification(remoteMessage, object : CometChat.CallbackListener<String?>(){
-                    override fun onSuccess(p0: String?) {
-                        // TODO("Not yet implemented")
-                    }
 
-                    override fun onError(p0: CometChatException?) {
-                        // TODO("Not yet implemented")
-                    }
+            if (CometChatNotification.isCometChatNotification(remoteMessage)) {
+                CometChatNotification.renderCometChatNotification(
+                    context = this,
+                    remoteMessage = remoteMessage,
+                    listener = object : CometChat.CallbackListener<String?>() {
+                        override fun onSuccess(response: String?) {
+                            Log.d(TAG, "CometChatNotification handled successfully: $response")
+                        }
 
-                })
+                        override fun onError(e: CometChatException?) {
+                            Log.e(TAG, "Error handling CometChatNotification: ${e?.message}")
+                        }
+                    }
+                )
             }
 
-            // Check if data needs to be processed by long running job
-            // if (isLongRunningJob()) {
-                // For long-running tasks (10 seconds or more) use WorkManager.
-                // scheduleJob()
-            // } else {
-                // Handle message within 10 seconds
-                // handleNow()
-            // }
+            // TODO: Add handling for non-CometChat notifications or long-running jobs if needed
         }
     }
 
-//    private fun sendNotification(messageBody: String) {
-//        val requestCode = 0
-//        val intent = Intent(this, MainActivity::class.java)
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-//        val pendingIntent = PendingIntent.getActivity(
-//            this,
-//            requestCode,
-//            intent,
-//            PendingIntent.FLAG_IMMUTABLE,
-//        )
-//
-//        val channelId = getString(R.string.default_notification_channel_id)
-//        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-//        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-//            .setSmallIcon(R.drawable.ic_notification)
-//            .setContentTitle(getString(R.string.fcm_message))
-//            .setContentText(messageBody)
-//            .setAutoCancel(true)
-//            .setSound(defaultSoundUri)
-//            .setContentIntent(pendingIntent)
-//
-//        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//
-//        val notificationId = 0
-//        notificationManager.notify(notificationId, notificationBuilder.build())
-//    }
-
     override fun onNewToken(token: String) {
-        Log.d(TAG, "Refreshed token: $token")
-        // If you want to send messages to this application instance or
-        // manage this apps subscriptions on the server side, send the
-        // FCM registration token to your app server.
+        Log.d(TAG, "FCM token refreshed: $token")
         sendRegistrationToServer(token)
     }
 
     private fun sendRegistrationToServer(token: String?) {
-        Log.d(TAG, "sendRegistrationTokenToServer($token)")
+        // TODO: Implement actual server sync if needed
+        Log.d(TAG, "sendRegistrationTokenToServer: $token")
     }
-
 }

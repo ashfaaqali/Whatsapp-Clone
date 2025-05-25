@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#192828"
-    tools:context=".ui.activity.VoiceCall">
+    tools:context=".ui.call.VoiceCall">
 
     <ImageView
         android:id="@+id/caller_profile_pic"
