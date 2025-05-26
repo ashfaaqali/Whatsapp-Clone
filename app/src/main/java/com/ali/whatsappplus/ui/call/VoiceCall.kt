@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityVoiceCallBinding
 import com.ali.whatsappplus.ui.fragment.PresenterFragment
-import com.ali.whatsappplus.util.Constants
+import com.ali.whatsappplus.common.util.Constants
 import com.cometchat.calls.core.CometChatCalls
 import com.cometchat.calls.model.GenerateToken
 import com.cometchat.chat.core.CometChat

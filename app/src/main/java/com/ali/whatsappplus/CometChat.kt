@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.ali.whatsappplus.ui.call.VoiceCall
-import com.ali.whatsappplus.util.Constants
-import com.ali.whatsappplus.util.cometchatnotification.CometChatNotification
+import com.ali.whatsappplus.common.util.Constants
+import com.ali.whatsappplus.common.cometchatnotification.CometChatNotification
 import com.cometchat.calls.core.CallAppSettings
 import com.cometchat.calls.core.CometChatCalls
 import com.cometchat.chat.constants.CometChatConstants

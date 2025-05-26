@@ -19,7 +19,7 @@ import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.FragmentRecentChatsBinding
 import com.ali.whatsappplus.ui.chat.ChatActivity
 import com.ali.whatsappplus.ui.main.MainActivity
-import com.ali.whatsappplus.util.Constants
+import com.ali.whatsappplus.common.util.Constants
 import com.ali.whatsappplus.ui.chat.ChatViewModel
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.ConversationsRequest

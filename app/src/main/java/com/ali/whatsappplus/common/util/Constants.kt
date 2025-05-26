@@ -1,4 +1,4 @@
-package com.ali.whatsappplus.util
+package com.ali.whatsappplus.common.util
 
 object Constants {
     const val DEFAULT_USER_ID = "ashfaq-ali"

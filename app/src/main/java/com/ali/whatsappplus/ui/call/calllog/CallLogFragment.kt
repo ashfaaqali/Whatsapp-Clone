@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ali.whatsappplus.databinding.FragmentCallsBinding
 import com.ali.whatsappplus.ui.call.calldetails.CallDetailsActivity
-import com.ali.whatsappplus.util.Constants
+import com.ali.whatsappplus.common.util.Constants
 import com.cometchat.calls.constants.CometChatCallsConstants
 import com.cometchat.calls.core.CallLogRequest.CallLogRequestBuilder
 import com.cometchat.calls.core.CometChatCalls

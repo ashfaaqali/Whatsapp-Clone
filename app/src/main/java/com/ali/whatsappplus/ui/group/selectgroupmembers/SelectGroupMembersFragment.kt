@@ -12,7 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ali.whatsappplus.databinding.FragmentSelectGroupMembersBinding
 import com.ali.whatsappplus.ui.group.GroupActivity
-import com.ali.whatsappplus.util.Constants
+import com.ali.whatsappplus.common.util.Constants
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.core.UsersRequest
 import com.cometchat.chat.exceptions.CometChatException

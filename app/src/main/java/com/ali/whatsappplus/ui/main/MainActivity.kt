@@ -17,8 +17,8 @@ import com.ali.whatsappplus.ui.call.calllog.CallLogFragment
 import com.ali.whatsappplus.ui.contacts.ContactsActivity
 import com.ali.whatsappplus.ui.conversation.ConversationsFragment
 import com.ali.whatsappplus.ui.updates.UpdatesFragment
-import com.ali.whatsappplus.util.Constants
-import com.ali.whatsappplus.util.Constants.DEFAULT_USER_ID
+import com.ali.whatsappplus.common.util.Constants
+import com.ali.whatsappplus.common.util.Constants.DEFAULT_USER_ID
 import com.google.android.material.tabs.TabLayout
 
 class MainActivity : AppCompatActivity() {

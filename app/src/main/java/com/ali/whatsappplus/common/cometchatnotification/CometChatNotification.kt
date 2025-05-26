@@ -1,4 +1,4 @@
-package com.ali.whatsappplus.util.cometchatnotification
+package com.ali.whatsappplus.common.cometchatnotification
 
 import android.app.NotificationManager
 import android.app.PendingIntent

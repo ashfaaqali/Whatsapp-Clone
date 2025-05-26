@@ -1,7 +1,7 @@
-package com.ali.whatsappplus.util.firebase
+package com.ali.whatsappplus.common.firebase
 
 import android.util.Log
-import com.ali.whatsappplus.util.cometchatnotification.CometChatNotification
+import com.ali.whatsappplus.common.cometchatnotification.CometChatNotification
 import com.cometchat.chat.core.CometChat
 import com.cometchat.chat.exceptions.CometChatException
 import com.google.firebase.messaging.FirebaseMessagingService

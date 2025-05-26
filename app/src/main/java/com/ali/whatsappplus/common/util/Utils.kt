@@ -1,4 +1,4 @@
-package com.ali.whatsappplus.util
+package com.ali.whatsappplus.common.util
 
 import android.annotation.SuppressLint
 import android.content.ContentUris

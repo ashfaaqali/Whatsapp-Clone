@@ -1,4 +1,4 @@
-package com.ali.whatsappplus.data.common
+package com.ali.whatsappplus.domain.common
 
 sealed class Result<out T> {
     data class Success<out T>(val data: T) : Result<T>()

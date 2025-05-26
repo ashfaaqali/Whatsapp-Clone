@@ -25,7 +25,7 @@ import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityChatBinding
 import com.ali.whatsappplus.ui.call.VoiceCall
 import com.ali.whatsappplus.ui.chat.bottomsheet.AttachmentsBottomSheet
-import com.ali.whatsappplus.util.Constants
+import com.ali.whatsappplus.common.util.Constants
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat

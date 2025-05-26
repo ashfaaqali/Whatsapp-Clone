@@ -5,9 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.ui.group.selectgroupmembers.SelectGroupMembersFragment
-import com.ali.whatsappplus.util.Constants.FRAGMENT_GROUP_DETAILS
-import com.ali.whatsappplus.util.Constants.FRAGMENT_SELECT_GROUP_MEMBERS
-import com.ali.whatsappplus.util.Constants.FRAGMENT_TO_LOAD
+import com.ali.whatsappplus.common.util.Constants.FRAGMENT_GROUP_DETAILS
+import com.ali.whatsappplus.common.util.Constants.FRAGMENT_SELECT_GROUP_MEMBERS
+import com.ali.whatsappplus.common.util.Constants.FRAGMENT_TO_LOAD
 
 class GroupActivity : AppCompatActivity() {
 

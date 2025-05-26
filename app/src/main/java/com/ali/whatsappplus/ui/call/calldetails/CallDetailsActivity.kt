@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.ali.whatsappplus.R
 import com.ali.whatsappplus.databinding.ActivityCallDetailsBinding
-import com.ali.whatsappplus.util.Constants
+import com.ali.whatsappplus.common.util.Constants
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
 

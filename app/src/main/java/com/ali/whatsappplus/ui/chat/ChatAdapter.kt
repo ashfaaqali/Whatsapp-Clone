@@ -31,7 +31,7 @@ import com.ali.whatsappplus.databinding.RightChatImageViewBinding
 import com.ali.whatsappplus.databinding.RightChatTextViewLongBinding
 import com.ali.whatsappplus.databinding.RightChatTextViewShortBinding
 import com.ali.whatsappplus.databinding.RightDeletedMessageLayoutBinding
-import com.ali.whatsappplus.util.Constants
+import com.ali.whatsappplus.common.util.Constants
 import com.bumptech.glide.Glide
 import com.cometchat.chat.constants.CometChatConstants
 import com.cometchat.chat.core.CometChat
